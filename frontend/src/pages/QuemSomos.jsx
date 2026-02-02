@@ -6,13 +6,6 @@ import { Card, CardContent } from '../components/ui/card';
 import { aboutData, productImages } from '../data/mock';
 
 const QuemSomos = () => {
-  const valuesItems = aboutData.values.map((value, index) => (
-    <li key={index} className="flex items-center gap-2 text-slate-600">
-      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-      <span className="text-sm">{value}</span>
-    </li>
-  ));
-
   return (
     <div className="min-h-screen pt-20">
       <section className="py-16 md:py-24 bg-slate-50 relative overflow-hidden">
@@ -80,7 +73,28 @@ const QuemSomos = () => {
                     <Heart className="w-7 h-7 text-cyan-600" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-4">Nossos Valores</h3>
-                  <ul className="space-y-2">{valuesItems}</ul>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2 text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span className="text-sm">Qualidade sem compromisso</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span className="text-sm">Ingredientes 100% naturais</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span className="text-sm">Transparência com nossos clientes</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span className="text-sm">Compromisso com resultados</span>
+                    </li>
+                    <li className="flex items-center gap-2 text-slate-600">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span className="text-sm">Atendimento humanizado</span>
+                    </li>
+                  </ul>
                 </div>
               </CardContent>
             </Card>
