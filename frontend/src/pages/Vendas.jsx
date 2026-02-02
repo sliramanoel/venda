@@ -140,7 +140,7 @@ const Vendas = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!shipping) {
@@ -153,12 +153,43 @@ const Vendas = () => {
       return;
     }
 
-    if (!siteConfig.paymentLink) {
-      toast.info('Link de pagamento será configurado em breve. Obrigado pelo interesse!');
-      return;
-    }
+    setSubmitting(true);
 
-    window.open(siteConfig.paymentLink, '_blank');
+    try {
+      // Create order in backend
+      const orderData = {
+        ...formData,
+        quantity,
+        productPrice,
+        shippingPrice: parseFloat(shipping.price),
+        totalPrice
+      };
+
+      const order = await ordersApi.create(orderData);
+      
+      toast.success(`Pedido ${order.orderNumber} criado com sucesso!`);
+
+      // Open payment link if configured
+      if (siteConfig.paymentLink) {
+        window.open(siteConfig.paymentLink, '_blank');
+      } else {
+        toast.info('Link de pagamento será configurado em breve. Entraremos em contato!');
+      }
+
+      // Reset form
+      setFormData({
+        name: '', email: '', phone: '', cep: '', address: '',
+        number: '', complement: '', neighborhood: '', city: '', state: ''
+      });
+      setQuantity(1);
+      setShipping(null);
+
+    } catch (error) {
+      console.error('Error creating order:', error);
+      toast.error('Erro ao criar pedido. Tente novamente.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // Preço por frasco adicional
