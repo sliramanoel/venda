@@ -474,7 +474,9 @@ const Vendas = () => {
                             {quantity === 2 && "2 Amostras + 1 Frasco"}
                             {quantity === 3 && "2 Amostras + 2 Frascos"}
                           </span>
-                          <span className="text-emerald-400 font-medium">GRÁTIS</span>
+                          <span className={quantity === 1 ? "text-emerald-400 font-medium" : "font-medium"}>
+                            {quantity === 1 ? "GRÁTIS" : `R$ ${productPrice.toFixed(2)}`}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center mb-3 sm:mb-4 text-sm sm:text-base">
                           <span className="text-slate-300">Frete</span>
