@@ -558,7 +558,6 @@ const Vendas = () => {
                           Pagar com PIX
                         </>
                       )}
-                      Pagar com PIX
                     </Button>
 
                     <p className="text-center text-[10px] sm:text-xs text-slate-500">
