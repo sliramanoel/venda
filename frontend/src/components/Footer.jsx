@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Brain, Mail, Phone, Instagram, MapPin } from 'lucide-react';
+import { Brain, Mail, Phone, Instagram } from 'lucide-react';
 import { siteConfig } from '../data/mock';
 
 export const Footer = () => {
@@ -8,44 +8,44 @@ export const Footer = () => {
 
   return (
     <footer className="bg-slate-900 text-slate-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="col-span-2 md:col-span-1 space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                <Brain className="w-6 h-6 text-white" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">
+              <span className="text-lg sm:text-xl font-bold text-white">
                 {siteConfig.name}
               </span>
             </Link>
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
               {siteConfig.description}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Links Rápidos</h4>
-            <ul className="space-y-3">
+            <h4 className="text-white font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Links Rápidos</h4>
+            <ul className="space-y-2 sm:space-y-3">
               <li>
-                <Link to="/" className="text-sm hover:text-emerald-400 transition-colors duration-200">
+                <Link to="/" className="text-xs sm:text-sm hover:text-emerald-400 transition-colors duration-200">
                   Início
                 </Link>
               </li>
               <li>
-                <Link to="/quem-somos" className="text-sm hover:text-emerald-400 transition-colors duration-200">
+                <Link to="/quem-somos" className="text-xs sm:text-sm hover:text-emerald-400 transition-colors duration-200">
                   Quem Somos
                 </Link>
               </li>
               <li>
-                <Link to="/faq" className="text-sm hover:text-emerald-400 transition-colors duration-200">
+                <Link to="/faq" className="text-xs sm:text-sm hover:text-emerald-400 transition-colors duration-200">
                   Perguntas Frequentes
                 </Link>
               </li>
               <li>
-                <Link to="/comprar" className="text-sm hover:text-emerald-400 transition-colors duration-200">
+                <Link to="/comprar" className="text-xs sm:text-sm hover:text-emerald-400 transition-colors duration-200">
                   Comprar Agora
                 </Link>
               </li>
@@ -54,18 +54,18 @@ export const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Contato</h4>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-sm">
-                <Phone className="w-4 h-4 text-emerald-500" />
+            <h4 className="text-white font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Contato</h4>
+            <ul className="space-y-2 sm:space-y-3">
+              <li className="flex items-center gap-2 text-xs sm:text-sm">
+                <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 flex-shrink-0" />
                 <span>{siteConfig.phone}</span>
               </li>
-              <li className="flex items-center gap-2 text-sm">
-                <Mail className="w-4 h-4 text-emerald-500" />
-                <span>{siteConfig.email}</span>
+              <li className="flex items-center gap-2 text-xs sm:text-sm">
+                <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 flex-shrink-0" />
+                <span className="break-all">{siteConfig.email}</span>
               </li>
-              <li className="flex items-center gap-2 text-sm">
-                <Instagram className="w-4 h-4 text-emerald-500" />
+              <li className="flex items-center gap-2 text-xs sm:text-sm">
+                <Instagram className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 flex-shrink-0" />
                 <span>{siteConfig.instagram}</span>
               </li>
             </ul>
@@ -73,20 +73,20 @@ export const Footer = () => {
 
           {/* Legal */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Informações</h4>
-            <ul className="space-y-3">
+            <h4 className="text-white font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Informações</h4>
+            <ul className="space-y-2 sm:space-y-3">
               <li>
-                <a href="#" className="text-sm hover:text-emerald-400 transition-colors duration-200">
+                <a href="#" className="text-xs sm:text-sm hover:text-emerald-400 transition-colors duration-200">
                   Política de Privacidade
                 </a>
               </li>
               <li>
-                <a href="#" className="text-sm hover:text-emerald-400 transition-colors duration-200">
+                <a href="#" className="text-xs sm:text-sm hover:text-emerald-400 transition-colors duration-200">
                   Termos de Uso
                 </a>
               </li>
               <li>
-                <a href="#" className="text-sm hover:text-emerald-400 transition-colors duration-200">
+                <a href="#" className="text-xs sm:text-sm hover:text-emerald-400 transition-colors duration-200">
                   Política de Envio
                 </a>
               </li>
@@ -95,13 +95,13 @@ export const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-slate-800">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-slate-500">
+        <div className="mt-8 sm:mt-10 lg:mt-12 pt-6 sm:pt-8 border-t border-slate-800">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+            <p className="text-xs sm:text-sm text-slate-500 text-center sm:text-left">
               © {currentYear} {siteConfig.name}. Todos os direitos reservados.
             </p>
-            <p className="text-xs text-slate-600">
-              * Este produto não substitui uma alimentação equilibrada e seu consumo deve ser orientado por profissional habilitado.
+            <p className="text-[10px] sm:text-xs text-slate-600 text-center sm:text-right">
+              * Este produto não substitui uma alimentação equilibrada.
             </p>
           </div>
         </div>
