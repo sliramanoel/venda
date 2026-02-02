@@ -141,7 +141,10 @@ const Vendas = () => {
     window.open(siteConfig.paymentLink, '_blank');
   };
 
-  const totalPrice = shipping ? parseFloat(shipping.price) : 0;
+  // Preço por frasco adicional
+  const pricePerBottle = 197;
+  const productPrice = quantity === 1 ? 0 : (quantity - 1) * pricePerBottle;
+  const totalPrice = shipping ? productPrice + parseFloat(shipping.price) : productPrice;
 
   return (
     <div className="min-h-screen pt-16 sm:pt-20 bg-slate-50">
