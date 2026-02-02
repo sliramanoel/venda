@@ -451,7 +451,11 @@ const Vendas = () => {
                     {shipping && (
                       <div className="p-3 sm:p-4 bg-slate-900 rounded-xl text-white">
                         <div className="flex justify-between items-center mb-2 text-sm sm:text-base">
-                          <span className="text-slate-300">Produto ({quantity * 2} frascos)</span>
+                          <span className="text-slate-300">
+                            {quantity === 1 && "2 Amostras Grátis"}
+                            {quantity === 2 && "2 Amostras + 1 Frasco"}
+                            {quantity === 3 && "2 Amostras + 2 Frascos"}
+                          </span>
                           <span className="text-emerald-400 font-medium">GRÁTIS</span>
                         </div>
                         <div className="flex justify-between items-center mb-3 sm:mb-4 text-sm sm:text-base">
