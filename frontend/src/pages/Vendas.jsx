@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Package, Truck, CreditCard, CheckCircle2, AlertCircle, Loader2, ShieldCheck, Clock, Star } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { toast } from 'sonner';
-import { productImages, siteConfig } from '../data/mock';
+import { settingsApi, imagesApi, ordersApi } from '../services/api';
 
 const shippingRates = {
   sudeste: { min: 15.90, max: 22.90, days: "3 a 5" },
