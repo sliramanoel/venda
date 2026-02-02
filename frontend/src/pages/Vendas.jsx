@@ -241,8 +241,13 @@ const Vendas = () => {
                               : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
                           }`}
                         >
-                          <span className="block text-sm sm:text-base font-semibold">2 Amostras Grátis</span>
-                          <span className="block text-xs text-slate-500 mt-0.5">Pague apenas o frete</span>
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span className="block text-sm sm:text-base font-semibold">2 Amostras Grátis</span>
+                              <span className="block text-xs text-slate-500 mt-0.5">Pague apenas o frete</span>
+                            </div>
+                            <span className="text-emerald-600 font-bold text-sm sm:text-base">GRÁTIS</span>
+                          </div>
                         </button>
                         
                         <button
@@ -257,8 +262,13 @@ const Vendas = () => {
                               : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
                           }`}
                         >
-                          <span className="block text-sm sm:text-base font-semibold">2 Amostras + 1 Frasco</span>
-                          <span className="block text-xs text-slate-500 mt-0.5">60 cápsulas extras</span>
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span className="block text-sm sm:text-base font-semibold">2 Amostras + 1 Frasco</span>
+                              <span className="block text-xs text-slate-500 mt-0.5">60 cápsulas extras</span>
+                            </div>
+                            <span className="text-slate-900 font-bold text-sm sm:text-base">R$ 197,00</span>
+                          </div>
                         </button>
                         
                         <button
@@ -273,8 +283,13 @@ const Vendas = () => {
                               : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
                           }`}
                         >
-                          <span className="block text-sm sm:text-base font-semibold">2 Amostras + 2 Frascos</span>
-                          <span className="block text-xs text-slate-500 mt-0.5">120 cápsulas extras</span>
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span className="block text-sm sm:text-base font-semibold">2 Amostras + 2 Frascos</span>
+                              <span className="block text-xs text-slate-500 mt-0.5">120 cápsulas extras</span>
+                            </div>
+                            <span className="text-slate-900 font-bold text-sm sm:text-base">R$ 394,00</span>
+                          </div>
                         </button>
                       </div>
                     </div>
