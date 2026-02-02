@@ -545,9 +545,19 @@ const Vendas = () => {
                       type="submit"
                       size="lg"
                       className="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/40 transition-all duration-300 h-14 sm:h-14 text-base sm:text-lg font-semibold"
-                      disabled={!shipping}
+                      disabled={!shipping || submitting}
                     >
-                      <CreditCard className="w-5 h-5 mr-2" />
+                      {submitting ? (
+                        <>
+                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                          Processando...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="w-5 h-5 mr-2" />
+                          Pagar com PIX
+                        </>
+                      )}
                       Pagar com PIX
                     </Button>
 
