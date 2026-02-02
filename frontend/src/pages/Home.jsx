@@ -18,9 +18,9 @@ const Home = () => {
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden">
         {/* Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-emerald-50/30" />
-        <div className="absolute top-20 right-0 w-96 h-96 bg-emerald-100/40 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-100/30 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-slate-50" />
+        <div className="absolute top-20 right-0 w-96 h-96 bg-emerald-100 opacity-40 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-100 opacity-30 rounded-full blur-3xl" />
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -32,10 +32,8 @@ const Home = () => {
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
-                {siteConfig.tagline.split(', ')[0]},
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">
-                  {' '}{siteConfig.tagline.split(', ')[1]}
-                </span>
+                Memória Afiada,
+                <span className="text-emerald-600"> Energia Plena</span>
               </h1>
               
               <p className="text-lg text-slate-600 leading-relaxed max-w-xl">
@@ -71,8 +69,8 @@ const Home = () => {
             
             {/* Image */}
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-200/50 to-teal-200/50 rounded-3xl blur-2xl transform rotate-6" />
-              <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-[1.02] transition-transform duration-500">
+              <div className="absolute inset-0 bg-emerald-200 opacity-50 rounded-3xl blur-2xl" style={{transform: 'rotate(6deg)'}} />
+              <div className="relative bg-white rounded-3xl shadow-2xl p-8 transform hover:scale-105 transition-transform duration-500">
                 <img
                   src={productImages.main}
                   alt="NeuroVita - Suplemento Natural"
@@ -103,7 +101,7 @@ const Home = () => {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {benefits.map((benefit, index) => {
+            {benefits.map((benefit) => {
               const IconComponent = iconMap[benefit.icon];
               return (
                 <Card 
@@ -111,7 +109,7 @@ const Home = () => {
                   className="group border-0 shadow-lg shadow-slate-100 hover:shadow-xl hover:shadow-emerald-100/50 transition-all duration-300 hover:-translate-y-1"
                 >
                   <CardContent className="p-6">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/25 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center mb-4 shadow-lg shadow-emerald-500/25 group-hover:scale-110 transition-transform duration-300">
                       <IconComponent className="w-7 h-7 text-white" />
                     </div>
                     <h3 className="text-lg font-semibold text-slate-900 mb-2">
@@ -129,7 +127,7 @@ const Home = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 md:py-28 bg-gradient-to-br from-slate-50 to-emerald-50/30">
+      <section className="py-20 md:py-28 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="inline-block px-4 py-1.5 bg-emerald-100 text-emerald-700 text-sm font-medium rounded-full mb-4">
@@ -156,7 +154,7 @@ const Home = () => {
                     "{testimonial.text}"
                   </p>
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-semibold">
+                    <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center text-white font-semibold">
                       {testimonial.name.charAt(0)}
                     </div>
                     <div>
@@ -173,8 +171,8 @@ const Home = () => {
 
       {/* CTA Section */}
       <section className="py-20 md:py-28 bg-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/20 to-teal-900/20" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-emerald-900 opacity-20" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500 opacity-10 rounded-full blur-3xl" />
         
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
