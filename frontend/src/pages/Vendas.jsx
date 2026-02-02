@@ -41,6 +41,26 @@ const Vendas = () => {
   const [shipping, setShipping] = useState(null);
   const [loadingCep, setLoadingCep] = useState(false);
   const [cepError, setCepError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [siteConfig, setSiteConfig] = useState({ paymentLink: '' });
+  const [productImages, setProductImages] = useState({ main: '' });
+
+  // Load settings and images from backend
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [settings, images] = await Promise.all([
+          settingsApi.get(),
+          imagesApi.get()
+        ]);
+        setSiteConfig(settings);
+        setProductImages(images);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+    loadData();
+  }, []);
 
   const formatCep = (value) => {
     const numbers = value.replace(/\D/g, '');
