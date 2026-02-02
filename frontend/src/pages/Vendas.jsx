@@ -224,25 +224,55 @@ const Vendas = () => {
                   <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                     {/* Quantity Selection - Mobile touch friendly */}
                     <div>
-                      <Label className="text-slate-700 font-medium text-sm sm:text-base">Quantidade de Amostras</Label>
-                      <div className="mt-2 grid grid-cols-3 gap-2 sm:gap-3">
-                        {[1, 2, 3].map((num) => (
-                          <button
-                            key={num}
-                            type="button"
-                            onClick={() => {
-                              setQuantity(num);
-                              setShipping(null);
-                            }}
-                            className={`py-3 sm:py-3 px-2 sm:px-4 rounded-xl border-2 font-medium transition-all duration-200 text-sm sm:text-base ${
-                              quantity === num
-                                ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
-                                : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
-                            }`}
-                          >
-                            {num * 2} frascos
-                          </button>
-                        ))}
+                      <Label className="text-slate-700 font-medium text-sm sm:text-base">Escolha sua opção</Label>
+                      <div className="mt-2 flex flex-col gap-2 sm:gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setQuantity(1);
+                            setShipping(null);
+                          }}
+                          className={`py-3 px-4 rounded-xl border-2 font-medium transition-all duration-200 text-left ${
+                            quantity === 1
+                              ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
+                              : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
+                          }`}
+                        >
+                          <span className="block text-sm sm:text-base font-semibold">2 Amostras Grátis</span>
+                          <span className="block text-xs text-slate-500 mt-0.5">Pague apenas o frete</span>
+                        </button>
+                        
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setQuantity(2);
+                            setShipping(null);
+                          }}
+                          className={`py-3 px-4 rounded-xl border-2 font-medium transition-all duration-200 text-left ${
+                            quantity === 2
+                              ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
+                              : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
+                          }`}
+                        >
+                          <span className="block text-sm sm:text-base font-semibold">2 Amostras + 1 Frasco</span>
+                          <span className="block text-xs text-slate-500 mt-0.5">60 cápsulas extras</span>
+                        </button>
+                        
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setQuantity(3);
+                            setShipping(null);
+                          }}
+                          className={`py-3 px-4 rounded-xl border-2 font-medium transition-all duration-200 text-left ${
+                            quantity === 3
+                              ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
+                              : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
+                          }`}
+                        >
+                          <span className="block text-sm sm:text-base font-semibold">2 Amostras + 2 Frascos</span>
+                          <span className="block text-xs text-slate-500 mt-0.5">120 cápsulas extras</span>
+                        </button>
                       </div>
                     </div>
 
