@@ -9,8 +9,8 @@ const QuemSomos = () => {
   return (
     <div className="min-h-screen pt-20">
       {/* Hero Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 relative overflow-hidden">
-        <div className="absolute top-20 right-0 w-80 h-80 bg-emerald-100/40 rounded-full blur-3xl" />
+      <section className="py-16 md:py-24 bg-slate-50 relative overflow-hidden">
+        <div className="absolute top-20 right-0 w-80 h-80 bg-emerald-100 opacity-40 rounded-full blur-3xl" />
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -20,7 +20,7 @@ const QuemSomos = () => {
               </span>
               <h1 className="text-4xl md:text-5xl font-bold text-slate-900">
                 Conheça a
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600"> NeuroVita</span>
+                <span className="text-emerald-600"> NeuroVita</span>
               </h1>
               <p className="text-lg text-slate-600 leading-relaxed">
                 {aboutData.history}
@@ -28,7 +28,7 @@ const QuemSomos = () => {
             </div>
             
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-200/50 to-teal-200/50 rounded-3xl blur-xl transform -rotate-3" />
+              <div className="absolute inset-0 bg-emerald-200 opacity-50 rounded-3xl blur-xl" style={{transform: 'rotate(-3deg)'}} />
               <img
                 src={productImages.secondary}
                 alt="Sobre NeuroVita"
@@ -46,7 +46,7 @@ const QuemSomos = () => {
             {/* Mission */}
             <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden group">
               <CardContent className="p-0">
-                <div className="h-2 bg-gradient-to-r from-emerald-500 to-teal-600" />
+                <div className="h-2 bg-emerald-500" />
                 <div className="p-8">
                   <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                     <Target className="w-7 h-7 text-emerald-600" />
@@ -60,7 +60,7 @@ const QuemSomos = () => {
             {/* Vision */}
             <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden group">
               <CardContent className="p-0">
-                <div className="h-2 bg-gradient-to-r from-teal-500 to-cyan-600" />
+                <div className="h-2 bg-teal-500" />
                 <div className="p-8">
                   <div className="w-14 h-14 rounded-2xl bg-teal-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                     <Eye className="w-7 h-7 text-teal-600" />
@@ -74,7 +74,7 @@ const QuemSomos = () => {
             {/* Values */}
             <Card className="border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 overflow-hidden group">
               <CardContent className="p-0">
-                <div className="h-2 bg-gradient-to-r from-cyan-500 to-sky-600" />
+                <div className="h-2 bg-cyan-500" />
                 <div className="p-8">
                   <div className="w-14 h-14 rounded-2xl bg-cyan-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                     <Heart className="w-7 h-7 text-cyan-600" />
@@ -96,7 +96,7 @@ const QuemSomos = () => {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-slate-50 to-emerald-50/30">
+      <section className="py-16 md:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="inline-block px-4 py-1.5 bg-emerald-100 text-emerald-700 text-sm font-medium rounded-full mb-4">
@@ -137,7 +137,7 @@ const QuemSomos = () => {
 
       {/* CTA Section */}
       <section className="py-16 md:py-24 bg-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/20 to-teal-900/20" />
+        <div className="absolute inset-0 bg-emerald-900 opacity-20" />
         
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
