@@ -5,7 +5,24 @@ import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { toast } from 'sonner';
-import { productData, productImages, siteConfig, shippingRates, regionByState } from '../data/mock';
+import { productImages, siteConfig } from '../data/mock';
+
+const shippingRates = {
+  sudeste: { min: 15.90, max: 22.90, days: "3 a 5" },
+  sul: { min: 18.90, max: 25.90, days: "4 a 6" },
+  nordeste: { min: 22.90, max: 32.90, days: "5 a 8" },
+  norte: { min: 25.90, max: 38.90, days: "6 a 10" },
+  centroOeste: { min: 19.90, max: 28.90, days: "4 a 7" }
+};
+
+const regionByState = {
+  SP: "sudeste", RJ: "sudeste", MG: "sudeste", ES: "sudeste",
+  PR: "sul", SC: "sul", RS: "sul",
+  BA: "nordeste", SE: "nordeste", AL: "nordeste", PE: "nordeste", 
+  PB: "nordeste", RN: "nordeste", CE: "nordeste", PI: "nordeste", MA: "nordeste",
+  AM: "norte", PA: "norte", AC: "norte", RO: "norte", RR: "norte", AP: "norte", TO: "norte",
+  MT: "centroOeste", MS: "centroOeste", GO: "centroOeste", DF: "centroOeste"
+};
 
 const Vendas = () => {
   const [formData, setFormData] = useState({
@@ -66,7 +83,6 @@ const Vendas = () => {
     setCepError('');
 
     try {
-      // Fetch address from ViaCEP
       const response = await fetch(`https://viacep.com.br/ws/${cepNumbers}/json/`);
       const data = await response.json();
 
@@ -76,7 +92,6 @@ const Vendas = () => {
         return;
       }
 
-      // Update address fields
       setFormData(prev => ({
         ...prev,
         address: data.logradouro || '',
@@ -85,11 +100,8 @@ const Vendas = () => {
         state: data.uf || '',
       }));
 
-      // Calculate shipping based on state/region
       const region = regionByState[data.uf] || 'sudeste';
       const rates = shippingRates[region];
-      
-      // Simulate shipping calculation with variation based on quantity
       const basePrice = rates.min + (Math.random() * (rates.max - rates.min));
       const finalPrice = basePrice * quantity;
 
@@ -121,102 +133,99 @@ const Vendas = () => {
       return;
     }
 
-    // Check if payment link is configured
     if (!siteConfig.paymentLink) {
       toast.info('Link de pagamento será configurado em breve. Obrigado pelo interesse!');
       return;
     }
 
-    // Open payment link
     window.open(siteConfig.paymentLink, '_blank');
   };
 
   const totalPrice = shipping ? parseFloat(shipping.price) : 0;
 
   return (
-    <div className="min-h-screen pt-20 bg-gradient-to-br from-slate-50 via-white to-emerald-50/30">
-      {/* Hero Banner */}
-      <section className="py-8 md:py-12 bg-emerald-600">
+    <div className="min-h-screen pt-16 sm:pt-20 bg-slate-50">
+      {/* Hero Banner - Mobile optimized */}
+      <section className="py-6 sm:py-8 md:py-12 bg-emerald-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full mb-4">
-            <Star className="w-4 h-4 text-amber-300 fill-amber-300" />
-            <span className="text-sm font-medium text-white">Oferta Especial por Tempo Limitado</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-full mb-3">
+            <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300 fill-amber-300" />
+            <span className="text-xs sm:text-sm font-medium text-white">Oferta Especial por Tempo Limitado</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-            {productData.description}
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 sm:mb-2">
+            2 Amostras Grátis - Pague apenas o frete!
           </h1>
-          <p className="text-emerald-100">
+          <p className="text-emerald-100 text-sm sm:text-base">
             Experimente o NeuroVita sem compromisso
           </p>
         </div>
       </section>
 
-      <section className="py-12 md:py-16">
+      <section className="py-6 sm:py-8 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Product Info */}
-            <div className="space-y-8">
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-12">
+            {/* Product Info - Mobile first */}
+            <div className="space-y-4 sm:space-y-6 lg:space-y-8">
               {/* Product Image */}
               <div className="relative">
-                <div className="absolute -inset-4 bg-gradient-to-br from-emerald-200/50 to-teal-200/50 rounded-3xl blur-xl" />
-                <div className="relative bg-white rounded-2xl shadow-xl p-8">
-                  <div className="absolute top-4 left-4 px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-full">
-                    {productData.freeText}
+                <div className="relative bg-white rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8">
+                  <div className="absolute top-2 left-2 sm:top-4 sm:left-4 px-3 py-1.5 bg-emerald-600 text-white text-xs sm:text-sm font-bold rounded-full z-10">
+                    GRÁTIS
                   </div>
                   <img
                     src={productImages.main}
-                    alt={productData.name}
+                    alt="NeuroVita"
                     className="w-full h-auto rounded-xl"
                   />
                 </div>
               </div>
 
-              {/* Product Details */}
+              {/* Product Details - Mobile card */}
               <Card className="border-0 shadow-lg">
-                <CardContent className="p-6 space-y-4">
-                  <h2 className="text-2xl font-bold text-slate-900">{productData.name}</h2>
-                  <p className="text-slate-600">{productData.subtitle}</p>
-                  <p className="text-sm text-slate-500">{productData.capsules}</p>
+                <CardContent className="p-4 sm:p-6 space-y-3 sm:space-y-4">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">NeuroVita</h2>
+                  <p className="text-slate-600 text-sm sm:text-base">Suplemento Natural para Memória e Disposição</p>
+                  <p className="text-xs sm:text-sm text-slate-500">60 cápsulas por frasco</p>
                   
-                  <div className="flex items-center gap-4 pt-4 border-t">
-                    <span className="text-slate-400 line-through text-lg">R$ {productData.originalPrice.toFixed(2)}</span>
-                    <span className="text-3xl font-bold text-emerald-600">GRÁTIS</span>
+                  <div className="flex items-center gap-3 sm:gap-4 pt-3 sm:pt-4 border-t">
+                    <span className="text-slate-400 line-through text-base sm:text-lg">R$ 197,00</span>
+                    <span className="text-2xl sm:text-3xl font-bold text-emerald-600">GRÁTIS</span>
                   </div>
-                  <p className="text-sm text-slate-600">*Pague apenas o frete</p>
+                  <p className="text-xs sm:text-sm text-slate-600">*Pague apenas o frete</p>
                 </CardContent>
               </Card>
 
-              {/* Trust Badges */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-white rounded-xl shadow-md">
-                  <ShieldCheck className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-                  <p className="text-xs text-slate-600">Compra Segura</p>
+              {/* Trust Badges - Mobile grid */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                <div className="text-center p-3 sm:p-4 bg-white rounded-xl shadow-md">
+                  <ShieldCheck className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600 mx-auto mb-1 sm:mb-2" />
+                  <p className="text-[10px] sm:text-xs text-slate-600">Compra Segura</p>
                 </div>
-                <div className="text-center p-4 bg-white rounded-xl shadow-md">
-                  <Truck className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-                  <p className="text-xs text-slate-600">Entrega Rápida</p>
+                <div className="text-center p-3 sm:p-4 bg-white rounded-xl shadow-md">
+                  <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600 mx-auto mb-1 sm:mb-2" />
+                  <p className="text-[10px] sm:text-xs text-slate-600">Entrega Rápida</p>
                 </div>
-                <div className="text-center p-4 bg-white rounded-xl shadow-md">
-                  <Clock className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-                  <p className="text-xs text-slate-600">Envio em 24h</p>
+                <div className="text-center p-3 sm:p-4 bg-white rounded-xl shadow-md">
+                  <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600 mx-auto mb-1 sm:mb-2" />
+                  <p className="text-[10px] sm:text-xs text-slate-600">Envio em 24h</p>
                 </div>
               </div>
             </div>
 
-            {/* Order Form */}
+            {/* Order Form - Mobile optimized */}
             <div>
-              <Card className="border-0 shadow-xl sticky top-24">
-                <CardContent className="p-6 md:p-8">
-                  <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+              <Card className="border-0 shadow-xl lg:sticky lg:top-24">
+                <CardContent className="p-4 sm:p-6 md:p-8">
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2">
                     <Package className="w-5 h-5 text-emerald-600" />
                     Finalize seu Pedido
                   </h3>
 
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Quantity Selection */}
+                  <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                    {/* Quantity Selection - Mobile touch friendly */}
                     <div>
-                      <Label className="text-slate-700 font-medium">Quantidade de Amostras</Label>
-                      <div className="mt-2 flex gap-3">
+                      <Label className="text-slate-700 font-medium text-sm sm:text-base">Quantidade de Amostras</Label>
+                      <div className="mt-2 grid grid-cols-3 gap-2 sm:gap-3">
                         {[1, 2, 3].map((num) => (
                           <button
                             key={num}
@@ -225,10 +234,10 @@ const Vendas = () => {
                               setQuantity(num);
                               setShipping(null);
                             }}
-                            className={`flex-1 py-3 px-4 rounded-xl border-2 font-medium transition-all duration-200 ${
+                            className={`py-3 sm:py-3 px-2 sm:px-4 rounded-xl border-2 font-medium transition-all duration-200 text-sm sm:text-base ${
                               quantity === num
                                 ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
-                                : 'border-slate-200 text-slate-600 hover:border-emerald-300'
+                                : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
                             }`}
                           >
                             {num * 2} frascos
@@ -237,23 +246,23 @@ const Vendas = () => {
                       </div>
                     </div>
 
-                    {/* Personal Info */}
-                    <div className="space-y-4">
+                    {/* Personal Info - Mobile stacked */}
+                    <div className="space-y-3 sm:space-y-4">
                       <div>
-                        <Label htmlFor="name">Nome Completo *</Label>
+                        <Label htmlFor="name" className="text-sm">Nome Completo *</Label>
                         <Input
                           id="name"
                           name="name"
                           value={formData.name}
                           onChange={handleInputChange}
                           placeholder="Seu nome completo"
-                          className="mt-1.5"
+                          className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
                           required
                         />
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
-                          <Label htmlFor="email">E-mail *</Label>
+                          <Label htmlFor="email" className="text-sm">E-mail *</Label>
                           <Input
                             id="email"
                             name="email"
@@ -261,33 +270,33 @@ const Vendas = () => {
                             value={formData.email}
                             onChange={handleInputChange}
                             placeholder="seu@email.com"
-                            className="mt-1.5"
+                            className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
                             required
                           />
                         </div>
                         <div>
-                          <Label htmlFor="phone">Telefone *</Label>
+                          <Label htmlFor="phone" className="text-sm">Telefone *</Label>
                           <Input
                             id="phone"
                             name="phone"
                             value={formData.phone}
                             onChange={handleInputChange}
                             placeholder="(00) 00000-0000"
-                            className="mt-1.5"
+                            className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
                             required
                           />
                         </div>
                       </div>
                     </div>
 
-                    {/* Shipping Calculator */}
-                    <div className="p-4 bg-slate-50 rounded-xl space-y-4">
+                    {/* Shipping Calculator - Mobile friendly */}
+                    <div className="p-3 sm:p-4 bg-slate-50 rounded-xl space-y-3 sm:space-y-4">
                       <div className="flex items-center gap-2">
                         <Truck className="w-5 h-5 text-emerald-600" />
-                        <span className="font-medium text-slate-900">Calcular Frete</span>
+                        <span className="font-medium text-slate-900 text-sm sm:text-base">Calcular Frete</span>
                       </div>
                       
-                      <div className="flex gap-3">
+                      <div className="flex gap-2 sm:gap-3">
                         <div className="flex-1">
                           <Input
                             name="cep"
@@ -295,13 +304,14 @@ const Vendas = () => {
                             onChange={handleInputChange}
                             placeholder="00000-000"
                             maxLength={9}
+                            className="h-11 sm:h-10 text-base sm:text-sm"
                           />
                         </div>
                         <Button
                           type="button"
                           onClick={calculateShipping}
                           disabled={loadingCep}
-                          className="bg-emerald-600 hover:bg-emerald-700"
+                          className="bg-emerald-600 hover:bg-emerald-700 h-11 sm:h-10 px-4 sm:px-6"
                         >
                           {loadingCep ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -312,94 +322,94 @@ const Vendas = () => {
                       </div>
 
                       {cepError && (
-                        <div className="flex items-center gap-2 text-red-600 text-sm">
-                          <AlertCircle className="w-4 h-4" />
+                        <div className="flex items-center gap-2 text-red-600 text-xs sm:text-sm">
+                          <AlertCircle className="w-4 h-4 flex-shrink-0" />
                           {cepError}
                         </div>
                       )}
 
                       {shipping && (
-                        <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                        <div className="p-3 sm:p-4 bg-emerald-50 rounded-lg border border-emerald-200">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="font-medium text-emerald-800">Frete Calculado</p>
-                              <p className="text-sm text-emerald-600">Entrega em {shipping.days} dias úteis</p>
+                              <p className="font-medium text-emerald-800 text-sm sm:text-base">Frete Calculado</p>
+                              <p className="text-xs sm:text-sm text-emerald-600">Entrega em {shipping.days} dias úteis</p>
                             </div>
-                            <span className="text-xl font-bold text-emerald-700">R$ {shipping.price}</span>
+                            <span className="text-lg sm:text-xl font-bold text-emerald-700">R$ {shipping.price}</span>
                           </div>
                         </div>
                       )}
                     </div>
 
-                    {/* Address Fields (shown after CEP) */}
+                    {/* Address Fields */}
                     {formData.city && (
-                      <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
-                        <div className="grid grid-cols-3 gap-4">
-                          <div className="col-span-2">
-                            <Label htmlFor="address">Endereço</Label>
+                      <div className="space-y-3 sm:space-y-4 animate-in slide-in-from-top-2 duration-300">
+                        <div className="grid grid-cols-4 gap-2 sm:gap-4">
+                          <div className="col-span-3">
+                            <Label htmlFor="address" className="text-sm">Endereço</Label>
                             <Input
                               id="address"
                               name="address"
                               value={formData.address}
                               onChange={handleInputChange}
-                              className="mt-1.5"
+                              className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
                             />
                           </div>
                           <div>
-                            <Label htmlFor="number">Número *</Label>
+                            <Label htmlFor="number" className="text-sm">Nº *</Label>
                             <Input
                               id="number"
                               name="number"
                               value={formData.number}
                               onChange={handleInputChange}
-                              className="mt-1.5"
+                              className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
                               required
                             />
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-2 sm:gap-4">
                           <div>
-                            <Label htmlFor="complement">Complemento</Label>
+                            <Label htmlFor="complement" className="text-sm">Complemento</Label>
                             <Input
                               id="complement"
                               name="complement"
                               value={formData.complement}
                               onChange={handleInputChange}
-                              placeholder="Apto, Bloco, etc."
-                              className="mt-1.5"
+                              placeholder="Apto, Bloco..."
+                              className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
                             />
                           </div>
                           <div>
-                            <Label htmlFor="neighborhood">Bairro</Label>
+                            <Label htmlFor="neighborhood" className="text-sm">Bairro</Label>
                             <Input
                               id="neighborhood"
                               name="neighborhood"
                               value={formData.neighborhood}
                               onChange={handleInputChange}
-                              className="mt-1.5"
+                              className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
                             />
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-2 sm:gap-4">
                           <div>
-                            <Label htmlFor="city">Cidade</Label>
+                            <Label htmlFor="city" className="text-sm">Cidade</Label>
                             <Input
                               id="city"
                               name="city"
                               value={formData.city}
                               onChange={handleInputChange}
-                              className="mt-1.5"
+                              className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm bg-slate-100"
                               readOnly
                             />
                           </div>
                           <div>
-                            <Label htmlFor="state">Estado</Label>
+                            <Label htmlFor="state" className="text-sm">Estado</Label>
                             <Input
                               id="state"
                               name="state"
                               value={formData.state}
                               onChange={handleInputChange}
-                              className="mt-1.5"
+                              className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm bg-slate-100"
                               readOnly
                             />
                           </div>
@@ -409,34 +419,34 @@ const Vendas = () => {
 
                     {/* Order Summary */}
                     {shipping && (
-                      <div className="p-4 bg-slate-900 rounded-xl text-white">
-                        <div className="flex justify-between items-center mb-2">
+                      <div className="p-3 sm:p-4 bg-slate-900 rounded-xl text-white">
+                        <div className="flex justify-between items-center mb-2 text-sm sm:text-base">
                           <span className="text-slate-300">Produto ({quantity * 2} frascos)</span>
                           <span className="text-emerald-400 font-medium">GRÁTIS</span>
                         </div>
-                        <div className="flex justify-between items-center mb-4">
+                        <div className="flex justify-between items-center mb-3 sm:mb-4 text-sm sm:text-base">
                           <span className="text-slate-300">Frete</span>
                           <span>R$ {shipping.price}</span>
                         </div>
-                        <div className="border-t border-slate-700 pt-4 flex justify-between items-center">
+                        <div className="border-t border-slate-700 pt-3 sm:pt-4 flex justify-between items-center">
                           <span className="font-medium">Total</span>
-                          <span className="text-2xl font-bold text-emerald-400">R$ {totalPrice.toFixed(2)}</span>
+                          <span className="text-xl sm:text-2xl font-bold text-emerald-400">R$ {totalPrice.toFixed(2)}</span>
                         </div>
                       </div>
                     )}
 
-                    {/* Submit Button */}
+                    {/* Submit Button - Large touch target */}
                     <Button
                       type="submit"
                       size="lg"
-                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/40 transition-all duration-300 h-14 text-lg"
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/40 transition-all duration-300 h-14 sm:h-14 text-base sm:text-lg font-semibold"
                       disabled={!shipping}
                     >
                       <CreditCard className="w-5 h-5 mr-2" />
                       Pagar com PIX
                     </Button>
 
-                    <p className="text-center text-xs text-slate-500">
+                    <p className="text-center text-[10px] sm:text-xs text-slate-500">
                       Pagamento seguro e instantâneo via PIX
                     </p>
                   </form>
