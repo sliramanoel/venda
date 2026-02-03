@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Package, Truck, CreditCard, CheckCircle2, AlertCircle, Loader2, ShieldCheck, Clock, Star, Timer, Flame } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
