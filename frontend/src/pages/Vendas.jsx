@@ -268,6 +268,15 @@ const Vendas = () => {
 
   return (
     <div className="min-h-screen pt-16 sm:pt-20 bg-slate-50">
+      {/* Urgency Bar - Fixed at top */}
+      <div className="bg-red-600 text-white py-2 px-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-xs sm:text-sm">
+          <Flame className="w-4 h-4 animate-pulse" />
+          <span className="font-medium">ATENÇÃO: Restam apenas <strong>23 unidades</strong> em estoque!</span>
+          <Flame className="w-4 h-4 animate-pulse" />
+        </div>
+      </div>
+
       {/* Hero Banner - Mobile optimized */}
       <section className="py-6 sm:py-8 md:py-12 bg-emerald-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
