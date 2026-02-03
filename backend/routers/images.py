@@ -55,3 +55,17 @@ async def update_images(images_update: ProductImagesUpdate):
     updated = await db.product_images.find_one({"_id": current["_id"]})
     updated["_id"] = str(updated["_id"])
     return updated
+
+@router.post("/reset")
+async def reset_images():
+    """Reset images to default"""
+    db = get_db()
+    
+    await db.product_images.delete_many({})
+    
+    default_images = ProductImagesBase().model_dump()
+    default_images["updatedAt"] = datetime.utcnow()
+    result = await db.product_images.insert_one(default_images)
+    default_images["_id"] = str(result.inserted_id)
+    
+    return default_images
