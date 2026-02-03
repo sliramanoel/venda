@@ -107,3 +107,55 @@ async def orionpay_webhook(
 async def test_webhook():
     """Test endpoint to verify webhook is accessible"""
     return {"status": "ok", "message": "Webhook endpoint is working"}
+
+@router.post("/orionpay/simulate-payment")
+async def simulate_payment(order_id: str):
+    """
+    Simulate a successful payment webhook for testing purposes.
+    This endpoint simulates what OrionPay would send when a payment is confirmed.
+    """
+    db = get_db()
+    
+    # Find the order
+    try:
+        order = await db.orders.find_one({"_id": ObjectId(order_id)})
+    except:
+        order = await db.orders.find_one({"orderNumber": order_id})
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+    
+    if order.get("status") == OrderStatus.PAID:
+        return {
+            "success": True,
+            "message": "Pedido já está pago",
+            "orderNumber": order.get("orderNumber"),
+            "status": "paid"
+        }
+    
+    # Simulate payment confirmation
+    await db.orders.update_one(
+        {"_id": order["_id"]},
+        {
+            "$set": {
+                "status": OrderStatus.PAID,
+                "paidAt": datetime.utcnow(),
+                "paymentData": {
+                    "simulated": True,
+                    "confirmedAt": datetime.utcnow().isoformat(),
+                    "transactionId": order.get("transactionId", f"SIM_{order['_id']}")
+                },
+                "updatedAt": datetime.utcnow()
+            }
+        }
+    )
+    
+    logger.info(f"Payment simulated for order {order.get('orderNumber')}")
+    
+    return {
+        "success": True,
+        "message": "Pagamento simulado com sucesso",
+        "orderNumber": order.get("orderNumber"),
+        "status": "paid",
+        "paidAt": datetime.utcnow().isoformat()
+    }
