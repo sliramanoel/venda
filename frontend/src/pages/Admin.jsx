@@ -799,7 +799,7 @@ const Admin = () => {
                     <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
                       <div>
                         <Label>Modo de Teste</Label>
-                        <p className="text-xs text-slate-500">Pagamentos em ambiente de teste</p>
+                        <p className="text-xs text-slate-500">Gera QR Code local (sem OrionPay)</p>
                       </div>
                       <Switch 
                         checked={settings?.paymentTestMode ?? true}
@@ -807,6 +807,28 @@ const Admin = () => {
                       />
                     </div>
                   </div>
+                  
+                  {/* Test Mode Alert */}
+                  {settings?.paymentTestMode && (
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-amber-600 text-lg">⚠️</span>
+                        </div>
+                        <div>
+                          <h5 className="font-medium text-amber-800">Modo de Teste Ativo</h5>
+                          <p className="text-sm text-amber-700 mt-1">
+                            O QR Code PIX está sendo gerado localmente. Para usar a OrionPay em produção:
+                          </p>
+                          <ul className="text-sm text-amber-700 mt-2 space-y-1 list-disc list-inside">
+                            <li>Verifique se sua API Key está válida em <a href="https://pay.orion.moe" target="_blank" rel="noopener noreferrer" className="underline">pay.orion.moe</a></li>
+                            <li>Desative o "Modo de Teste" acima</li>
+                            <li>Configure o webhook para receber confirmações</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Webhook URL */}
