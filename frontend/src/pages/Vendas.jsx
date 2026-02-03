@@ -113,6 +113,8 @@ const Vendas = () => {
   const [settings, setSettings] = useState(null);
   const [images, setImages] = useState({ main: '' });
   const [loading, setLoading] = useState(true);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [validatingField, setValidatingField] = useState(null);
 
   // Load settings and images from backend
   useEffect(() => {
