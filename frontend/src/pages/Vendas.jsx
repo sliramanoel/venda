@@ -507,10 +507,7 @@ const Vendas = () => {
                           <button
                             key={option.id}
                             type="button"
-                            onClick={() => {
-                              setSelectedOptionId(option.id);
-                              setShipping(null);
-                            }}
+                            onClick={() => handleOptionSelect(option.id)}
                             className={`py-3 px-4 rounded-xl border-2 font-medium transition-all duration-200 text-left ${
                               selectedOptionId === option.id
                                 ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
