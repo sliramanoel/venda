@@ -176,6 +176,14 @@ REACT_APP_BACKEND_URL=https://neurovita-sales.preview.emergentagent.com
     - SEO meta tags (title, description, keywords)
     - Admin panel tab for Meta Ads configuration
     - Dynamic meta tags based on page content
+16. ✅ **Payment Gateway Configuration** - Dec 2025
+    - OrionPay API Key configurable via admin panel
+    - Webhook Secret configuration
+    - PIX expiration time setting (5-120 minutes)
+    - Test mode toggle
+    - Webhook URL display with copy button
+    - Integration status indicator
+    - Fallback to environment variable if not configured in DB
 
 ## Backlog / Future Enhancements
 
