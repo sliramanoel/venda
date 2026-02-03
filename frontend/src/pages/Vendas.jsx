@@ -124,6 +124,7 @@ const Vendas = () => {
   const [loading, setLoading] = useState(true);
   const [fieldErrors, setFieldErrors] = useState({});
   const [validatingField, setValidatingField] = useState(null);
+  const [hasTrackedView, setHasTrackedView] = useState(false);
 
   // Load settings and images from backend
   useEffect(() => {
@@ -143,6 +144,16 @@ const Vendas = () => {
         } else if (settingsData?.productOptions?.length > 0) {
           setSelectedOptionId(settingsData.productOptions[0].id);
         }
+        
+        // Track ViewContent when page loads with product data
+        if (!hasTrackedView) {
+          trackViewContent({
+            name: settingsData?.productName || 'NeuroVita',
+            id: '1',
+            price: defaultOption?.price || 0
+          });
+          setHasTrackedView(true);
+        }
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
@@ -150,7 +161,22 @@ const Vendas = () => {
       }
     };
     loadData();
-  }, []);
+  }, [hasTrackedView]);
+
+  // Track when user selects a product option
+  const handleOptionSelect = (optionId) => {
+    setSelectedOptionId(optionId);
+    setShipping(null);
+    
+    const option = settings?.productOptions?.find(o => o.id === optionId);
+    if (option) {
+      trackAddToCart({
+        name: option.name,
+        id: String(optionId),
+        price: option.price
+      });
+    }
+  };
 
   const formatCep = (value) => {
     const numbers = value.replace(/\D/g, '');
