@@ -75,6 +75,12 @@ All site content is managed through admin panel:
 
 ## API Endpoints
 
+### Authentication (NEW)
+- `POST /api/auth/register` - Register new admin user
+- `POST /api/auth/login` - Login with email/password
+- `GET /api/auth/me` - Get current user info
+- `POST /api/auth/verify` - Verify JWT token
+
 ### Settings
 - `GET /api/settings` - Get site configuration
 - `PUT /api/settings` - Update configuration
