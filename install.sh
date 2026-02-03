@@ -199,7 +199,7 @@ setup_backend() {
     source venv/bin/activate
     
     # Instalar dependências
-    pip install --upgrade pip
+    pip install --upgrade pip setuptools wheel
     pip install -r requirements.txt
     
     # Criar arquivo .env
