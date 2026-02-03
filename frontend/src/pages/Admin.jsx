@@ -159,10 +159,21 @@ const Admin = () => {
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Painel de Administração</h1>
             <p className="text-slate-600 mt-1 text-sm">Personalize completamente seu site</p>
           </div>
-          <Button onClick={handleSave} disabled={isSaving} className="bg-emerald-600 hover:bg-emerald-700">
-            {isSaving ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-            {isSaving ? 'Salvando...' : 'Salvar Tudo'}
-          </Button>
+          <div className="flex items-center gap-3">
+            {currentUser && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg shadow-sm border">
+                <User className="w-4 h-4 text-slate-500" />
+                <span className="text-sm text-slate-700">{currentUser.name}</span>
+              </div>
+            )}
+            <Button onClick={handleSave} disabled={isSaving} className="bg-emerald-600 hover:bg-emerald-700">
+              {isSaving ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              {isSaving ? 'Salvando...' : 'Salvar Tudo'}
+            </Button>
+            <Button onClick={handleLogout} variant="outline" className="text-slate-600 hover:text-red-600 hover:border-red-300">
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
