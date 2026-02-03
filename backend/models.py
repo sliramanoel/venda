@@ -210,6 +210,13 @@ class OrderCreate(BaseModel):
     productPrice: float
     shippingPrice: float
     totalPrice: float
+    # UTM tracking fields for Meta Ads attribution
+    utmSource: Optional[str] = ""
+    utmMedium: Optional[str] = ""
+    utmCampaign: Optional[str] = ""
+    utmTerm: Optional[str] = ""
+    utmContent: Optional[str] = ""
+    fbclid: Optional[str] = ""
 
 class OrderResponse(BaseModel):
     id: str = Field(alias="_id")
