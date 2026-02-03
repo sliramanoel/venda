@@ -1,3 +1,38 @@
+/* CSS Custom Properties for Theme Colors */
+:root {
+    --color-primary: #059669;
+    --color-primary-light: #d1fae5;
+    --color-primary-dark: #047857;
+    --color-secondary: #0d9488;
+    --color-accent: #f59e0b;
+    --color-primary-rgb: 5, 150, 105;
+}
+
+/* Apply primary color to key elements */
+.bg-primary { background-color: var(--color-primary) !important; }
+.bg-primary-light { background-color: var(--color-primary-light) !important; }
+.bg-primary-dark { background-color: var(--color-primary-dark) !important; }
+.text-primary { color: var(--color-primary) !important; }
+.text-primary-dark { color: var(--color-primary-dark) !important; }
+.border-primary { border-color: var(--color-primary) !important; }
+
+/* Dynamic hover states */
+.hover\:bg-primary:hover { background-color: var(--color-primary) !important; }
+.hover\:bg-primary-dark:hover { background-color: var(--color-primary-dark) !important; }
+
+/* Button primary override */
+.btn-primary {
+    background-color: var(--color-primary) !important;
+}
+.btn-primary:hover {
+    background-color: var(--color-primary-dark) !important;
+}
+
+/* Focus ring with primary color */
+.focus-primary:focus {
+    --tw-ring-color: var(--color-primary);
+}
+
 .App-logo {
     height: 40vmin;
     pointer-events: none;
@@ -10,7 +45,7 @@
 }
 
 .App-link {
-    color: #10b981;
+    color: var(--color-primary);
 }
 
 @keyframes App-logo-spin {
