@@ -281,6 +281,13 @@ const Vendas = () => {
         region: region,
       });
 
+      // Track AddPaymentInfo when shipping is calculated
+      const selectedOption = settings?.productOptions?.find(o => o.id === selectedOptionId);
+      trackAddPaymentInfo({
+        optionId: String(selectedOptionId),
+        totalPrice: (selectedOption?.price || 0) + basePrice
+      });
+
       toast.success('Frete calculado com sucesso!');
     } catch (error) {
       setCepError('Erro ao buscar CEP. Tente novamente.');
