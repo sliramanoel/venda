@@ -338,20 +338,11 @@ EOF
 configure_nginx() {
     print_header "Configurando Nginx"
     
+    # Configuração inicial SEM SSL (Certbot vai adicionar depois)
     cat > /etc/nginx/sites-available/${APP_NAME} << EOF
 server {
     listen 80;
     server_name ${DOMAIN} www.${DOMAIN};
-    
-    # Redirecionar para HTTPS
-    return 301 https://\$server_name\$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
-    server_name ${DOMAIN} www.${DOMAIN};
-    
-    # SSL será configurado pelo Certbot
     
     # Logs
     access_log ${APP_DIR}/logs/nginx_access.log;
@@ -384,11 +375,6 @@ server {
         proxy_cache_bypass \$http_upgrade;
         proxy_read_timeout 300;
         proxy_connect_timeout 300;
-        
-        # CORS headers
-        add_header Access-Control-Allow-Origin "https://${DOMAIN}" always;
-        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
-        add_header Access-Control-Allow-Headers "Authorization, Content-Type" always;
     }
     
     # Uploads
