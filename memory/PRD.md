@@ -141,6 +141,16 @@ REACT_APP_BACKEND_URL=https://neurovita-sales.preview.emergentagent.com
     - Password hashing with bcrypt
     - Protected admin routes
     - Logout functionality
+12. ✅ **Payment Webhook & Simulation (P1)** - Dec 2025
+    - OrionPay webhook endpoint for payment confirmation
+    - Payment simulation endpoint for testing
+    - Order status updates (pending → paid)
+13. ✅ **Image Upload System (P2)** - Dec 2025
+    - File upload endpoint with validation
+    - Support for JPG, PNG, GIF, WebP, SVG
+    - Max 5MB file size
+    - Admin panel with URL/Upload toggle
+    - Image serving with caching
 
 ## Backlog / Future Enhancements
 
