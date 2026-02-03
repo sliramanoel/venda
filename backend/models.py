@@ -135,6 +135,13 @@ class SettingsBase(BaseModel):
     metaTitle: str = ""  # <title> tag - falls back to siteName if empty
     metaDescription: str = ""  # Meta description - falls back to description if empty
     metaKeywords: str = "suplemento natural, memória, concentração, disposição, energia"
+    
+    # Payment Gateway Configuration
+    paymentGateway: str = "orionpay"  # orionpay, mercadopago, pagseguro, etc.
+    orionpayApiKey: str = ""  # OrionPay API Key
+    orionpayWebhookSecret: str = ""  # OrionPay Webhook Secret (optional)
+    paymentTestMode: bool = True  # Enable test mode for payments
+    pixExpirationMinutes: int = 30  # PIX expiration time in minutes
 
 class SettingsUpdate(BaseModel):
     siteName: Optional[str] = None
