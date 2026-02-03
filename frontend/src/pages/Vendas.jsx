@@ -342,13 +342,30 @@ const Vendas = () => {
       const productPrice = selectedOption?.price || 0;
       const totalPrice = productPrice + parseFloat(shipping.price);
 
+      // Get UTM params for attribution
+      const utmParams = getOrderUTMParams();
+
       const orderData = {
         ...formData,
         quantity: selectedOptionId,
         productPrice,
         shippingPrice: parseFloat(shipping.price),
-        totalPrice
+        totalPrice,
+        // Include UTM params for campaign attribution
+        utmSource: utmParams.utm_source || '',
+        utmMedium: utmParams.utm_medium || '',
+        utmCampaign: utmParams.utm_campaign || '',
+        utmTerm: utmParams.utm_term || '',
+        utmContent: utmParams.utm_content || '',
+        fbclid: utmParams.fbclid || '',
       };
+
+      // Track InitiateCheckout before creating order
+      trackInitiateCheckout({
+        productName: settings?.productName || 'NeuroVita',
+        optionId: String(selectedOptionId),
+        totalPrice
+      });
 
       const order = await ordersApi.create(orderData);
       
@@ -360,7 +377,8 @@ const Vendas = () => {
 
     } catch (error) {
       console.error('Error creating order:', error);
-      toast.error('Erro ao criar pedido. Tente novamente.');
+      const errorMsg = error.response?.data?.detail || 'Erro ao criar pedido. Tente novamente.';
+      toast.error(errorMsg);
       setSubmitting(false);
     }
   };
