@@ -118,14 +118,25 @@ async def delete_image(filename: str):
 @router.get("/list")
 async def list_images():
     """List all uploaded images"""
-    base_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
+    # Get external URL
+    external_url = ''
+    frontend_env_path = Path(__file__).parent.parent.parent / "frontend" / ".env"
+    if frontend_env_path.exists():
+        with open(frontend_env_path) as f:
+            for line in f:
+                if line.startswith('REACT_APP_BACKEND_URL='):
+                    external_url = line.split('=', 1)[1].strip().strip('"\'')
+                    break
+    
+    if not external_url:
+        external_url = 'http://localhost:8001'
     
     images = []
     for file in UPLOAD_DIR.iterdir():
         if file.is_file() and is_allowed_file(file.name):
             images.append({
                 "filename": file.name,
-                "url": f"{base_url}/api/uploads/images/{file.name}",
+                "url": f"{external_url}/api/uploads/images/{file.name}",
                 "size": file.stat().st_size,
                 "createdAt": datetime.fromtimestamp(file.stat().st_ctime).isoformat()
             })
