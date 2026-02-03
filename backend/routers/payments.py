@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 from motor.motor_asyncio import AsyncIOMotorClient
-from datetime import datetime
+from datetime import datetime, timedelta
 from bson import ObjectId
 import os
 import httpx
@@ -18,17 +18,41 @@ def get_db():
     client = AsyncIOMotorClient(mongo_url)
     return client[os.environ.get('DB_NAME')]
 
-def get_api_key():
-    return os.environ.get('ORIONPAY_API_KEY')
+async def get_payment_settings():
+    """Get payment gateway settings from database"""
+    db = get_db()
+    settings = await db.settings.find_one({}, {"_id": 0})
+    
+    if not settings:
+        # Return defaults if no settings
+        return {
+            "paymentGateway": "orionpay",
+            "orionpayApiKey": os.environ.get('ORIONPAY_API_KEY', ''),
+            "orionpayWebhookSecret": "",
+            "paymentTestMode": True,
+            "pixExpirationMinutes": 30
+        }
+    
+    # Fallback to env var if not in settings
+    if not settings.get("orionpayApiKey"):
+        settings["orionpayApiKey"] = os.environ.get('ORIONPAY_API_KEY', '')
+    
+    return settings
 
 @router.post("/pix/generate")
 async def generate_pix_payment(order_id: str):
     """Generate PIX payment for an order"""
     db = get_db()
-    api_key = get_api_key()
+    payment_settings = await get_payment_settings()
+    
+    api_key = payment_settings.get("orionpayApiKey")
+    expiration_minutes = payment_settings.get("pixExpirationMinutes", 30)
     
     if not api_key:
-        raise HTTPException(status_code=500, detail="API Key não configurada")
+        raise HTTPException(
+            status_code=500, 
+            detail="API Key do gateway de pagamento não configurada. Configure no painel admin."
+        )
     
     # Get order
     try:
@@ -39,7 +63,7 @@ async def generate_pix_payment(order_id: str):
     if not order:
         raise HTTPException(status_code=404, detail="Pedido não encontrado")
     
-    # Check if already has a PIX
+    # Check if already has a valid PIX
     if order.get("pixCode") and order.get("pixExpiration"):
         expiration = order.get("pixExpiration")
         if isinstance(expiration, datetime) and expiration > datetime.utcnow():
@@ -63,7 +87,8 @@ async def generate_pix_payment(order_id: str):
                 json={
                     "amount": order["totalPrice"],
                     "email": order["email"],
-                    "name": order["name"]
+                    "name": order["name"],
+                    "externalId": str(order["_id"])
                 },
                 timeout=30.0
             )
@@ -78,14 +103,10 @@ async def generate_pix_payment(order_id: str):
             data = response.json()
             pix_data = data.get("data", data)
             
-            # Update order with PIX info
-            pix_expiration = datetime.utcnow().replace(
-                hour=datetime.utcnow().hour,
-                minute=datetime.utcnow().minute + 30,
-                second=0,
-                microsecond=0
-            )
+            # Calculate expiration time
+            pix_expiration = datetime.utcnow() + timedelta(minutes=expiration_minutes)
             
+            # Update order with PIX info
             await db.orders.update_one(
                 {"_id": order["_id"]},
                 {
@@ -131,4 +152,16 @@ async def check_pix_status(order_id: str):
         "isPaid": order.get("status") == OrderStatus.PAID,
         "pixCode": order.get("pixCode"),
         "transactionId": order.get("transactionId")
+    }
+
+@router.get("/config")
+async def get_payment_config():
+    """Get payment gateway configuration status (without sensitive data)"""
+    payment_settings = await get_payment_settings()
+    
+    return {
+        "gateway": payment_settings.get("paymentGateway", "orionpay"),
+        "isConfigured": bool(payment_settings.get("orionpayApiKey")),
+        "testMode": payment_settings.get("paymentTestMode", True),
+        "pixExpirationMinutes": payment_settings.get("pixExpirationMinutes", 30)
     }
