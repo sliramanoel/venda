@@ -1060,16 +1060,6 @@ const Admin = () => {
               </CardContent>
             </Card>
           </TabsContent>
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
         </Tabs>
       </div>
     </div>
