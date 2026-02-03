@@ -1,30 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Target, Eye, Heart, Award, Users, Leaf, ArrowRight } from 'lucide-react';
+import { Target, Eye, Heart, Award, Users, Leaf, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { imagesApi } from '../services/api';
-
-const aboutData = {
-  mission: "Nossa missão é proporcionar saúde e bem-estar através de suplementos naturais de alta qualidade, ajudando pessoas a alcançarem seu potencial máximo de memória e disposição.",
-  vision: "Ser referência nacional em suplementação natural para saúde cognitiva, reconhecida pela qualidade e eficácia de nossos produtos.",
-  history: "A NeuroVita nasceu da busca por soluções naturais para melhorar a qualidade de vida. Fundada por especialistas em nutrição e fitoterapia, nossa empresa se dedica a desenvolver fórmulas que combinam o melhor da natureza com a ciência moderna."
-};
+import { settingsApi, imagesApi } from '../services/api';
 
 const QuemSomos = () => {
-  const [productImages, setProductImages] = useState({ secondary: '' });
+  const [settings, setSettings] = useState(null);
+  const [images, setImages] = useState({ secondary: '' });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadImages = async () => {
+    const loadData = async () => {
       try {
-        const images = await imagesApi.get();
-        setProductImages(images);
+        const [settingsData, imagesData] = await Promise.all([
+          settingsApi.get(),
+          imagesApi.get()
+        ]);
+        setSettings(settingsData);
+        setImages(imagesData);
       } catch (error) {
-        console.error('Error loading images:', error);
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
       }
     };
-    loadImages();
+    loadData();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+      </div>
+    );
+  }
+
+  const productName = settings?.productName || 'NeuroVita';
+  const siteName = settings?.siteName || 'NeuroVita';
+  const aboutHistory = settings?.aboutHistory || 'Nascemos da busca por soluções naturais para melhorar a qualidade de vida.';
+  const aboutMission = settings?.aboutMission || 'Nossa missão é proporcionar saúde e bem-estar através de suplementos naturais de alta qualidade.';
+  const aboutVision = settings?.aboutVision || 'Ser referência nacional em suplementação natural.';
+  const aboutValues = settings?.aboutValues || [
+    'Qualidade sem compromisso',
+    'Ingredientes 100% naturais',
+    'Transparência com nossos clientes',
+    'Compromisso com resultados',
+    'Atendimento humanizado'
+  ];
+  const ctaText = settings?.hero?.ctaText || 'Experimente Grátis';
 
   return (
     <div className="min-h-screen pt-20">
@@ -38,17 +62,17 @@ const QuemSomos = () => {
                 Sobre Nós
               </span>
               <h1 className="text-4xl md:text-5xl font-bold text-slate-900">
-                Conheça a <span className="text-emerald-600">NeuroVita</span>
+                Conheça a <span className="text-emerald-600">{siteName}</span>
               </h1>
               <p className="text-lg text-slate-600 leading-relaxed">
-                {aboutData.history}
+                {aboutHistory}
               </p>
             </div>
             
             <div className="relative">
               <img
-                src={productImages.secondary}
-                alt="Sobre NeuroVita"
+                src={images?.secondary || ''}
+                alt={`Sobre ${siteName}`}
                 className="relative w-full h-auto rounded-3xl shadow-2xl"
               />
             </div>
@@ -67,7 +91,7 @@ const QuemSomos = () => {
                     <Target className="w-7 h-7 text-emerald-600" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-4">Nossa Missão</h3>
-                  <p className="text-slate-600 leading-relaxed">{aboutData.mission}</p>
+                  <p className="text-slate-600 leading-relaxed">{aboutMission}</p>
                 </div>
               </CardContent>
             </Card>
@@ -80,7 +104,7 @@ const QuemSomos = () => {
                     <Eye className="w-7 h-7 text-teal-600" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-4">Nossa Visão</h3>
-                  <p className="text-slate-600 leading-relaxed">{aboutData.vision}</p>
+                  <p className="text-slate-600 leading-relaxed">{aboutVision}</p>
                 </div>
               </CardContent>
             </Card>
@@ -94,26 +118,12 @@ const QuemSomos = () => {
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-4">Nossos Valores</h3>
                   <ul className="space-y-2">
-                    <li className="flex items-center gap-2 text-slate-600">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span className="text-sm">Qualidade sem compromisso</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-slate-600">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span className="text-sm">Ingredientes 100% naturais</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-slate-600">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span className="text-sm">Transparência com nossos clientes</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-slate-600">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span className="text-sm">Compromisso com resultados</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-slate-600">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span className="text-sm">Atendimento humanizado</span>
-                    </li>
+                    {aboutValues.map((value, index) => (
+                      <li key={index} className="flex items-center gap-2 text-slate-600">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        <span className="text-sm">{value}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </CardContent>
@@ -129,7 +139,7 @@ const QuemSomos = () => {
               Diferenciais
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              Por que confiar na NeuroVita?
+              Por que confiar na {siteName}?
             </h2>
           </div>
 
@@ -167,11 +177,11 @@ const QuemSomos = () => {
             Faça parte da nossa história
           </h2>
           <p className="text-lg text-slate-300 mb-10">
-            Experimente o NeuroVita e descubra o poder dos suplementos naturais.
+            Experimente o {productName} e descubra o poder dos suplementos naturais.
           </p>
           <Link to="/comprar">
             <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-xl">
-              Experimente Grátis
+              {ctaText}
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </Link>

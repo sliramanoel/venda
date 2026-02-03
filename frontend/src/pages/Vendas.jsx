@@ -28,13 +28,11 @@ const regionByState = {
 // Countdown Timer Component
 const CountdownTimer = () => {
   const [timeLeft, setTimeLeft] = useState(() => {
-    // Check if there's a saved end time in sessionStorage
     const savedEndTime = sessionStorage.getItem('neurovita_offer_end');
     if (savedEndTime) {
       const remaining = Math.max(0, Math.floor((parseInt(savedEndTime) - Date.now()) / 1000));
       return remaining;
     }
-    // Set initial time: 15 minutes
     const initialTime = 15 * 60;
     sessionStorage.setItem('neurovita_offer_end', (Date.now() + initialTime * 1000).toString());
     return initialTime;
@@ -46,7 +44,6 @@ const CountdownTimer = () => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
-          // Reset timer when it reaches 0
           const newTime = 15 * 60;
           sessionStorage.setItem('neurovita_offer_end', (Date.now() + newTime * 1000).toString());
           return newTime;
@@ -60,7 +57,7 @@ const CountdownTimer = () => {
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
-  const isUrgent = timeLeft < 300; // Less than 5 minutes
+  const isUrgent = timeLeft < 300;
 
   return (
     <div className={`flex items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl ${
@@ -108,26 +105,37 @@ const Vendas = () => {
     city: '',
     state: '',
   });
-  const [quantity, setQuantity] = useState(1);
+  const [selectedOptionId, setSelectedOptionId] = useState(1);
   const [shipping, setShipping] = useState(null);
   const [loadingCep, setLoadingCep] = useState(false);
   const [cepError, setCepError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [siteConfig, setSiteConfig] = useState({ paymentLink: '' });
-  const [productImages, setProductImages] = useState({ main: '' });
+  const [settings, setSettings] = useState(null);
+  const [images, setImages] = useState({ main: '' });
+  const [loading, setLoading] = useState(true);
 
   // Load settings and images from backend
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [settings, images] = await Promise.all([
+        const [settingsData, imagesData] = await Promise.all([
           settingsApi.get(),
           imagesApi.get()
         ]);
-        setSiteConfig(settings);
-        setProductImages(images);
+        setSettings(settingsData);
+        setImages(imagesData);
+        
+        // Set default selected option
+        const defaultOption = settingsData?.productOptions?.find(o => o.isDefault);
+        if (defaultOption) {
+          setSelectedOptionId(defaultOption.id);
+        } else if (settingsData?.productOptions?.length > 0) {
+          setSelectedOptionId(settingsData.productOptions[0].id);
+        }
       } catch (error) {
         console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
       }
     };
     loadData();
@@ -194,10 +202,9 @@ const Vendas = () => {
       const region = regionByState[data.uf] || 'sudeste';
       const rates = shippingRates[region];
       const basePrice = rates.min + (Math.random() * (rates.max - rates.min));
-      const finalPrice = basePrice * quantity;
 
       setShipping({
-        price: finalPrice.toFixed(2),
+        price: basePrice.toFixed(2),
         days: rates.days,
         region: region,
       });
@@ -227,10 +234,13 @@ const Vendas = () => {
     setSubmitting(true);
 
     try {
-      // Create order in backend
+      const selectedOption = productOptions.find(o => o.id === selectedOptionId);
+      const productPrice = selectedOption?.price || 0;
+      const totalPrice = productPrice + parseFloat(shipping.price);
+
       const orderData = {
         ...formData,
-        quantity,
+        quantity: selectedOptionId,
         productPrice,
         shippingPrice: parseFloat(shipping.price),
         totalPrice
@@ -240,7 +250,6 @@ const Vendas = () => {
       
       toast.success(`Pedido ${order.orderNumber} criado! Redirecionando para pagamento...`);
 
-      // Redirect to payment page
       setTimeout(() => {
         navigate(`/pagamento/${order._id}`);
       }, 1000);
@@ -252,9 +261,27 @@ const Vendas = () => {
     }
   };
 
-  // Preço por frasco adicional
-  const pricePerBottle = 197;
-  const productPrice = quantity === 1 ? 0 : (quantity - 1) * pricePerBottle;
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+      </div>
+    );
+  }
+
+  const productName = settings?.productName || 'NeuroVita';
+  const productSubtitle = settings?.productSubtitle || 'Suplemento Natural para Memória e Disposição';
+  const productDescription = settings?.productDescription || '60 cápsulas por frasco';
+  const originalPrice = settings?.originalPrice || 197;
+  const productOptions = settings?.productOptions || [
+    { id: 1, name: '2 Amostras Grátis', description: 'Pague apenas o frete', price: 0, isDefault: true },
+    { id: 2, name: '2 Amostras + 1 Frasco', description: '60 cápsulas extras', price: 197 },
+    { id: 3, name: '2 Amostras + 2 Frascos', description: '120 cápsulas extras', price: 394 },
+  ];
+  const urgencyText = settings?.hero?.urgencyText || 'ATENÇÃO: Restam apenas 23 unidades em estoque!';
+  
+  const selectedOption = productOptions.find(o => o.id === selectedOptionId) || productOptions[0];
+  const productPrice = selectedOption?.price || 0;
   const totalPrice = shipping ? productPrice + parseFloat(shipping.price) : productPrice;
 
   return (
@@ -263,7 +290,7 @@ const Vendas = () => {
       <div className="bg-red-600 text-white py-2 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-xs sm:text-sm">
           <Flame className="w-4 h-4 animate-pulse" />
-          <span className="font-medium">ATENÇÃO: Restam apenas <strong>23 unidades</strong> em estoque!</span>
+          <span className="font-medium" dangerouslySetInnerHTML={{ __html: urgencyText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
           <Flame className="w-4 h-4 animate-pulse" />
         </div>
       </div>
@@ -276,10 +303,10 @@ const Vendas = () => {
             <span className="text-xs sm:text-sm font-medium text-white">Oferta Especial por Tempo Limitado</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 sm:mb-2">
-            2 Amostras Grátis - Pague apenas o frete!
+            {productOptions[0]?.name || '2 Amostras Grátis'} - Pague apenas o frete!
           </h1>
           <p className="text-emerald-100 text-sm sm:text-base">
-            Experimente o NeuroVita sem compromisso
+            Experimente o {productName} sem compromisso
           </p>
         </div>
       </section>
@@ -296,8 +323,8 @@ const Vendas = () => {
                     GRÁTIS
                   </div>
                   <img
-                    src={productImages.main}
-                    alt="NeuroVita"
+                    src={images?.main || ''}
+                    alt={productName}
                     className="w-full h-auto rounded-xl"
                   />
                 </div>
@@ -306,12 +333,12 @@ const Vendas = () => {
               {/* Product Details - Mobile card */}
               <Card className="border-0 shadow-lg">
                 <CardContent className="p-4 sm:p-6 space-y-3 sm:space-y-4">
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">NeuroVita</h2>
-                  <p className="text-slate-600 text-sm sm:text-base">Suplemento Natural para Memória e Disposição</p>
-                  <p className="text-xs sm:text-sm text-slate-500">60 cápsulas por frasco</p>
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900">{productName}</h2>
+                  <p className="text-slate-600 text-sm sm:text-base">{productSubtitle}</p>
+                  <p className="text-xs sm:text-sm text-slate-500">{productDescription}</p>
                   
                   <div className="flex items-center gap-3 sm:gap-4 pt-3 sm:pt-4 border-t">
-                    <span className="text-slate-400 line-through text-base sm:text-lg">R$ 197,00</span>
+                    <span className="text-slate-400 line-through text-base sm:text-lg">R$ {originalPrice.toFixed(2)}</span>
                     <span className="text-2xl sm:text-3xl font-bold text-emerald-600">GRÁTIS</span>
                   </div>
                   <p className="text-xs sm:text-sm text-slate-600">*Pague apenas o frete</p>
@@ -350,72 +377,36 @@ const Vendas = () => {
                   </h3>
 
                   <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-                    {/* Quantity Selection - Mobile touch friendly */}
+                    {/* Quantity Selection - Dynamic from settings */}
                     <div>
                       <Label className="text-slate-700 font-medium text-sm sm:text-base">Escolha sua opção</Label>
                       <div className="mt-2 flex flex-col gap-2 sm:gap-3">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setQuantity(1);
-                            setShipping(null);
-                          }}
-                          className={`py-3 px-4 rounded-xl border-2 font-medium transition-all duration-200 text-left ${
-                            quantity === 1
-                              ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
-                              : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
-                          }`}
-                        >
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <span className="block text-sm sm:text-base font-semibold">2 Amostras Grátis</span>
-                              <span className="block text-xs text-slate-500 mt-0.5">Pague apenas o frete</span>
+                        {productOptions.map((option) => (
+                          <button
+                            key={option.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedOptionId(option.id);
+                              setShipping(null);
+                            }}
+                            className={`py-3 px-4 rounded-xl border-2 font-medium transition-all duration-200 text-left ${
+                              selectedOptionId === option.id
+                                ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
+                                : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
+                            }`}
+                            data-testid={`option-${option.id}`}
+                          >
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <span className="block text-sm sm:text-base font-semibold">{option.name}</span>
+                                <span className="block text-xs text-slate-500 mt-0.5">{option.description}</span>
+                              </div>
+                              <span className={`font-bold text-sm sm:text-base ${option.price === 0 ? 'text-emerald-600' : 'text-slate-900'}`}>
+                                {option.price === 0 ? 'GRÁTIS' : `R$ ${option.price.toFixed(2)}`}
+                              </span>
                             </div>
-                            <span className="text-emerald-600 font-bold text-sm sm:text-base">GRÁTIS</span>
-                          </div>
-                        </button>
-                        
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setQuantity(2);
-                            setShipping(null);
-                          }}
-                          className={`py-3 px-4 rounded-xl border-2 font-medium transition-all duration-200 text-left ${
-                            quantity === 2
-                              ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
-                              : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
-                          }`}
-                        >
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <span className="block text-sm sm:text-base font-semibold">2 Amostras + 1 Frasco</span>
-                              <span className="block text-xs text-slate-500 mt-0.5">60 cápsulas extras</span>
-                            </div>
-                            <span className="text-slate-900 font-bold text-sm sm:text-base">R$ 197,00</span>
-                          </div>
-                        </button>
-                        
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setQuantity(3);
-                            setShipping(null);
-                          }}
-                          className={`py-3 px-4 rounded-xl border-2 font-medium transition-all duration-200 text-left ${
-                            quantity === 3
-                              ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
-                              : 'border-slate-200 text-slate-600 hover:border-emerald-300 active:bg-slate-50'
-                          }`}
-                        >
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <span className="block text-sm sm:text-base font-semibold">2 Amostras + 2 Frascos</span>
-                              <span className="block text-xs text-slate-500 mt-0.5">120 cápsulas extras</span>
-                            </div>
-                            <span className="text-slate-900 font-bold text-sm sm:text-base">R$ 394,00</span>
-                          </div>
-                        </button>
+                          </button>
+                        ))}
                       </div>
                     </div>
 
@@ -431,6 +422,7 @@ const Vendas = () => {
                           placeholder="Seu nome completo"
                           className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
                           required
+                          data-testid="input-name"
                         />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -445,6 +437,7 @@ const Vendas = () => {
                             placeholder="seu@email.com"
                             className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
                             required
+                            data-testid="input-email"
                           />
                         </div>
                         <div>
@@ -457,6 +450,7 @@ const Vendas = () => {
                             placeholder="(00) 00000-0000"
                             className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
                             required
+                            data-testid="input-phone"
                           />
                         </div>
                       </div>
@@ -478,6 +472,7 @@ const Vendas = () => {
                             placeholder="00000-000"
                             maxLength={9}
                             className="h-11 sm:h-10 text-base sm:text-sm"
+                            data-testid="input-cep"
                           />
                         </div>
                         <Button
@@ -485,6 +480,7 @@ const Vendas = () => {
                           onClick={calculateShipping}
                           disabled={loadingCep}
                           className="bg-emerald-600 hover:bg-emerald-700 h-11 sm:h-10 px-4 sm:px-6"
+                          data-testid="btn-calculate-shipping"
                         >
                           {loadingCep ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -537,6 +533,7 @@ const Vendas = () => {
                               onChange={handleInputChange}
                               className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
                               required
+                              data-testid="input-number"
                             />
                           </div>
                         </div>
@@ -594,13 +591,9 @@ const Vendas = () => {
                     {shipping && (
                       <div className="p-3 sm:p-4 bg-slate-900 rounded-xl text-white">
                         <div className="flex justify-between items-center mb-2 text-sm sm:text-base">
-                          <span className="text-slate-300">
-                            {quantity === 1 && "2 Amostras Grátis"}
-                            {quantity === 2 && "2 Amostras + 1 Frasco"}
-                            {quantity === 3 && "2 Amostras + 2 Frascos"}
-                          </span>
-                          <span className={quantity === 1 ? "text-emerald-400 font-medium" : "font-medium"}>
-                            {quantity === 1 ? "GRÁTIS" : `R$ ${productPrice.toFixed(2)}`}
+                          <span className="text-slate-300">{selectedOption?.name}</span>
+                          <span className={productPrice === 0 ? "text-emerald-400 font-medium" : "font-medium"}>
+                            {productPrice === 0 ? "GRÁTIS" : `R$ ${productPrice.toFixed(2)}`}
                           </span>
                         </div>
                         <div className="flex justify-between items-center mb-3 sm:mb-4 text-sm sm:text-base">
@@ -620,6 +613,7 @@ const Vendas = () => {
                       size="lg"
                       className="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/40 transition-all duration-300 h-14 sm:h-14 text-base sm:text-lg font-semibold"
                       disabled={!shipping || submitting}
+                      data-testid="btn-submit-order"
                     >
                       {submitting ? (
                         <>

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { HelpCircle, ArrowRight } from 'lucide-react';
+import { HelpCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import {
   Accordion,
@@ -8,46 +8,38 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '../components/ui/accordion';
-
-const faqItems = [
-  {
-    id: "item-1",
-    question: "O que é o NeuroVita?",
-    answer: "NeuroVita é um suplemento natural desenvolvido para auxiliar na melhora da memória, concentração e disposição. Nossa fórmula exclusiva combina ingredientes naturais cientificamente estudados."
-  },
-  {
-    id: "item-2",
-    question: "Como devo tomar o NeuroVita?",
-    answer: "Recomendamos tomar 2 cápsulas ao dia, preferencialmente pela manhã, com um copo de água. Para melhores resultados, mantenha o uso contínuo."
-  },
-  {
-    id: "item-3",
-    question: "Quanto tempo leva para ver resultados?",
-    answer: "Os resultados podem variar de pessoa para pessoa, mas a maioria dos usuários relatam melhorias perceptíveis entre 2 a 4 semanas de uso contínuo."
-  },
-  {
-    id: "item-4",
-    question: "O NeuroVita possui contraindicações?",
-    answer: "Por ser um produto natural, o NeuroVita é seguro para a maioria das pessoas. No entanto, gestantes, lactantes e pessoas com condições médicas específicas devem consultar um médico antes do uso."
-  },
-  {
-    id: "item-5",
-    question: "Como funciona a oferta das amostras grátis?",
-    answer: "Você recebe 2 amostras grátis do NeuroVita pagando apenas o frete. É a oportunidade perfeita para experimentar nosso produto sem compromisso."
-  },
-  {
-    id: "item-6",
-    question: "Qual a forma de pagamento?",
-    answer: "Aceitamos pagamento via PIX, que é instantâneo e seguro. Após a confirmação do pagamento, seu pedido é enviado em até 24 horas úteis."
-  },
-  {
-    id: "item-7",
-    question: "Como acompanho meu pedido?",
-    answer: "Após o envio, você receberá o código de rastreamento por e-mail ou WhatsApp para acompanhar a entrega em tempo real."
-  }
-];
+import { settingsApi } from '../services/api';
 
 const FAQ = () => {
+  const [settings, setSettings] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const data = await settingsApi.get();
+        setSettings(data);
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadSettings();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+      </div>
+    );
+  }
+
+  const faqItems = settings?.faq || [];
+  const productName = settings?.productName || 'NeuroVita';
+  const whatsapp = settings?.whatsapp || '5511999999999';
+
   return (
     <div className="min-h-screen pt-20">
       <section className="py-16 md:py-20 bg-slate-50 relative overflow-hidden">
@@ -61,91 +53,38 @@ const FAQ = () => {
             Perguntas <span className="text-emerald-600">Frequentes</span>
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Tire suas dúvidas sobre o NeuroVita e saiba tudo sobre nosso suplemento natural.
+            Tire suas dúvidas sobre o {productName} e saiba tudo sobre nosso suplemento natural.
           </p>
         </div>
       </section>
 
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Accordion type="single" collapsible className="space-y-4">
-            <AccordionItem value="item-1" className="border border-slate-200 rounded-xl px-6 shadow-sm">
-              <AccordionTrigger className="text-left py-5 hover:no-underline">
-                <span className="text-slate-900 font-medium hover:text-emerald-600">
-                  {faqItems[0].question}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="text-slate-600 pb-5 leading-relaxed">
-                {faqItems[0].answer}
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-2" className="border border-slate-200 rounded-xl px-6 shadow-sm">
-              <AccordionTrigger className="text-left py-5 hover:no-underline">
-                <span className="text-slate-900 font-medium hover:text-emerald-600">
-                  {faqItems[1].question}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="text-slate-600 pb-5 leading-relaxed">
-                {faqItems[1].answer}
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-3" className="border border-slate-200 rounded-xl px-6 shadow-sm">
-              <AccordionTrigger className="text-left py-5 hover:no-underline">
-                <span className="text-slate-900 font-medium hover:text-emerald-600">
-                  {faqItems[2].question}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="text-slate-600 pb-5 leading-relaxed">
-                {faqItems[2].answer}
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-4" className="border border-slate-200 rounded-xl px-6 shadow-sm">
-              <AccordionTrigger className="text-left py-5 hover:no-underline">
-                <span className="text-slate-900 font-medium hover:text-emerald-600">
-                  {faqItems[3].question}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="text-slate-600 pb-5 leading-relaxed">
-                {faqItems[3].answer}
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-5" className="border border-slate-200 rounded-xl px-6 shadow-sm">
-              <AccordionTrigger className="text-left py-5 hover:no-underline">
-                <span className="text-slate-900 font-medium hover:text-emerald-600">
-                  {faqItems[4].question}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="text-slate-600 pb-5 leading-relaxed">
-                {faqItems[4].answer}
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-6" className="border border-slate-200 rounded-xl px-6 shadow-sm">
-              <AccordionTrigger className="text-left py-5 hover:no-underline">
-                <span className="text-slate-900 font-medium hover:text-emerald-600">
-                  {faqItems[5].question}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="text-slate-600 pb-5 leading-relaxed">
-                {faqItems[5].answer}
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-7" className="border border-slate-200 rounded-xl px-6 shadow-sm">
-              <AccordionTrigger className="text-left py-5 hover:no-underline">
-                <span className="text-slate-900 font-medium hover:text-emerald-600">
-                  {faqItems[6].question}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="text-slate-600 pb-5 leading-relaxed">
-                {faqItems[6].answer}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          {faqItems.length > 0 ? (
+            <Accordion type="single" collapsible className="space-y-4">
+              {faqItems.map((item, index) => (
+                <AccordionItem 
+                  key={index} 
+                  value={`item-${index}`} 
+                  className="border border-slate-200 rounded-xl px-6 shadow-sm"
+                >
+                  <AccordionTrigger className="text-left py-5 hover:no-underline">
+                    <span className="text-slate-900 font-medium hover:text-emerald-600">
+                      {item.question}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-slate-600 pb-5 leading-relaxed">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+            <div className="text-center py-12 text-slate-500">
+              <HelpCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p>Nenhuma pergunta frequente cadastrada.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -158,7 +97,7 @@ const FAQ = () => {
             Nossa equipe está pronta para ajudar você. Entre em contato conosco!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer">
+            <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white">
                 Falar no WhatsApp
               </Button>

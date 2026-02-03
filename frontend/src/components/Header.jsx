@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Brain } from 'lucide-react';
 import { Button } from './ui/button';
-import { siteConfig } from '../data/mock';
+import { settingsApi } from '../services/api';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [settings, setSettings] = useState({ siteName: 'NeuroVita' });
   const location = useLocation();
 
   const navLinks = [
@@ -17,6 +18,19 @@ export const Header = () => {
   ];
 
   const isActive = (path) => location.pathname === path;
+
+  // Load settings from backend
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const data = await settingsApi.get();
+        setSettings(data);
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
+    };
+    loadSettings();
+  }, []);
 
   // Close menu on route change
   useEffect(() => {
@@ -53,11 +67,15 @@ export const Header = () => {
           <div className="flex items-center justify-between h-14 sm:h-16 md:h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:shadow-emerald-500/40 transition-shadow duration-300">
-                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-              </div>
+              {settings?.logoUrl ? (
+                <img src={settings.logoUrl} alt={settings.siteName} className="h-8 sm:h-10 object-contain" />
+              ) : (
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:shadow-emerald-500/40 transition-shadow duration-300">
+                  <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
+              )}
               <span className="text-lg sm:text-xl font-bold text-slate-800 tracking-tight">
-                {siteConfig.name}
+                {settings?.siteName || 'NeuroVita'}
               </span>
             </Link>
 
@@ -82,7 +100,7 @@ export const Header = () => {
             <div className="hidden md:block">
               <Link to="/comprar">
                 <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/40 transition-all duration-300">
-                  Experimente Grátis
+                  {settings?.hero?.ctaText || 'Experimente Grátis'}
                 </Button>
               </Link>
             </div>
@@ -92,6 +110,7 @@ export const Header = () => {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden p-2 -mr-2 rounded-lg text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-colors"
               aria-label="Menu"
+              data-testid="mobile-menu-btn"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -128,7 +147,7 @@ export const Header = () => {
               <div className="pt-3">
                 <Link to="/comprar" onClick={() => setIsMenuOpen(false)}>
                   <Button className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-base font-semibold">
-                    Experimente Grátis
+                    {settings?.hero?.ctaText || 'Experimente Grátis'}
                   </Button>
                 </Link>
               </div>
