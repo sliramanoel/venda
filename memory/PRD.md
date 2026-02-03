@@ -166,20 +166,22 @@ REACT_APP_BACKEND_URL=https://neurovita-sales.preview.emergentagent.com
 ## Backlog / Future Enhancements
 
 ### P1 (High Priority)
-- [ ] Test OrionPay webhook end-to-end (payment confirmation flow)
-- [ ] Add image upload functionality (instead of URL)
+- [x] ~~Test OrionPay webhook end-to-end (payment confirmation flow)~~ ✅ DONE
+- [x] ~~Add image upload functionality (instead of URL)~~ ✅ DONE
 
 ### P2 (Medium Priority)
 - [ ] Order status email notifications
 - [ ] Multiple payment methods
 - [ ] Order tracking page for customers
 - [ ] SEO meta tags configuration
+- [ ] Password recovery via email
 
 ### P3 (Low Priority)
 - [ ] Multi-language support
 - [ ] A/B testing for different layouts
 - [ ] Analytics dashboard
 - [ ] Discount codes system
+- [ ] Two-factor authentication (2FA)
 
 ## Known Considerations
 - Database is MongoDB - data persists across restarts
