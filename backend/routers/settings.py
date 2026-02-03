@@ -7,13 +7,12 @@ from models import SettingsBase, SettingsUpdate, SettingsResponse
 
 router = APIRouter(prefix="/api/settings", tags=["settings"])
 
-# Get database connection
 def get_db():
     mongo_url = os.environ.get('MONGO_URL')
     client = AsyncIOMotorClient(mongo_url)
     return client[os.environ.get('DB_NAME')]
 
-@router.get("", response_model=SettingsResponse)
+@router.get("")
 async def get_settings():
     """Get site settings"""
     db = get_db()
@@ -30,7 +29,7 @@ async def get_settings():
     settings["_id"] = str(settings["_id"])
     return settings
 
-@router.put("", response_model=SettingsResponse)
+@router.put("")
 async def update_settings(settings_update: SettingsUpdate):
     """Update site settings"""
     db = get_db()
@@ -45,7 +44,17 @@ async def update_settings(settings_update: SettingsUpdate):
         current = await db.settings.find_one({"_id": result.inserted_id})
     
     # Update only provided fields
-    update_data = {k: v for k, v in settings_update.model_dump().items() if v is not None}
+    update_data = {}
+    for key, value in settings_update.model_dump().items():
+        if value is not None:
+            # Handle nested objects
+            if hasattr(value, 'model_dump'):
+                update_data[key] = value.model_dump()
+            elif isinstance(value, list) and len(value) > 0 and hasattr(value[0], 'model_dump'):
+                update_data[key] = [item.model_dump() for item in value]
+            else:
+                update_data[key] = value
+    
     update_data["updatedAt"] = datetime.utcnow()
     
     await db.settings.update_one(
@@ -56,3 +65,17 @@ async def update_settings(settings_update: SettingsUpdate):
     updated = await db.settings.find_one({"_id": current["_id"]})
     updated["_id"] = str(updated["_id"])
     return updated
+
+@router.post("/reset")
+async def reset_settings():
+    """Reset settings to default"""
+    db = get_db()
+    
+    await db.settings.delete_many({})
+    
+    default_settings = SettingsBase().model_dump()
+    default_settings["updatedAt"] = datetime.utcnow()
+    result = await db.settings.insert_one(default_settings)
+    default_settings["_id"] = str(result.inserted_id)
+    
+    return default_settings
