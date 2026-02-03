@@ -80,7 +80,7 @@ export const imagesApi = {
     return response.data;
   },
   update: async (data) => {
-    const response = await axios.put(`${API}/images`, data);
+    const response = await apiClient.put('/images', data);
     return response.data;
   }
 };
