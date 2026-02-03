@@ -9,6 +9,7 @@ import QuemSomos from "./pages/QuemSomos";
 import FAQ from "./pages/FAQ";
 import Vendas from "./pages/Vendas";
 import Pagamento from "./pages/Pagamento";
+import Sucesso from "./pages/Sucesso";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import { settingsApi } from "./services/api";
