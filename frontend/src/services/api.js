@@ -47,4 +47,16 @@ export const ordersApi = {
   }
 };
 
-export default { settingsApi, imagesApi, ordersApi };
+// Payments API (OrionPay)
+export const paymentsApi = {
+  generatePix: async (orderId) => {
+    const response = await axios.post(`${API}/payments/pix/generate?order_id=${orderId}`);
+    return response.data;
+  },
+  checkStatus: async (orderId) => {
+    const response = await axios.get(`${API}/payments/pix/status/${orderId}`);
+    return response.data;
+  }
+};
+
+export default { settingsApi, imagesApi, ordersApi, paymentsApi };
