@@ -125,7 +125,7 @@ ORIONPAY_API_KEY=opay_xxxxx
 
 ### Frontend (.env)
 ```
-REACT_APP_BACKEND_URL=https://neurovita-sales.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://pix-checkout-system.preview.emergentagent.com
 ```
 
 ## Testing Status
