@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "./components/ui/sonner";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import ThemeProvider from "./components/ThemeProvider";
 import Home from "./pages/Home";
 import QuemSomos from "./pages/QuemSomos";
 import FAQ from "./pages/FAQ";
