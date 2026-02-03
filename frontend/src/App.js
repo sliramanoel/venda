@@ -10,6 +10,7 @@ import FAQ from "./pages/FAQ";
 import Vendas from "./pages/Vendas";
 import Pagamento from "./pages/Pagamento";
 import Admin from "./pages/Admin";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/comprar" element={<Vendas />} />
             <Route path="/pagamento/:orderId" element={<Pagamento />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/login" element={<Login />} />
           </Routes>
         </main>
         <Footer />
