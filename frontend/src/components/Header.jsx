@@ -153,16 +153,23 @@ export const Header = () => {
                   onClick={() => setIsMenuOpen(false)}
                   className={`px-4 py-3.5 rounded-xl text-base font-medium transition-all duration-200 ${
                     isActive(link.path)
-                      ? 'text-emerald-600 bg-emerald-50'
-                      : 'text-slate-700 hover:text-emerald-600 hover:bg-slate-50 active:bg-slate-100'
+                      ? ''
+                      : 'text-slate-700 hover:bg-slate-50 active:bg-slate-100'
                   }`}
+                  style={isActive(link.path) ? {
+                    color: settings?.primaryColor || '#059669',
+                    backgroundColor: settings?.primaryColorLight || '#d1fae5'
+                  } : {}}
                 >
                   {link.label}
                 </Link>
               ))}
               <div className="pt-3">
                 <Link to="/comprar" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-base font-semibold">
+                  <Button 
+                    className="w-full h-12 text-white text-base font-semibold"
+                    style={{ backgroundColor: settings?.primaryColor || '#059669' }}
+                  >
                     {settings?.hero?.ctaText || 'Experimente Grátis'}
                   </Button>
                 </Link>
