@@ -520,6 +520,7 @@ main() {
     echo ""
     
     check_root
+    fix_apt_pkg
     collect_info
     
     update_system
