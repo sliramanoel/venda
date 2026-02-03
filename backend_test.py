@@ -225,7 +225,7 @@ class NeuroVitaAPITest:
                 
                 if len(data) > 0:
                     first_order = data[0]
-                    required_fields = ['id', 'orderNumber', 'name', 'email', 'status', 'createdAt']
+                    required_fields = ['_id', 'orderNumber', 'name', 'email', 'status', 'createdAt']  # Backend uses _id
                     
                     for field in required_fields:
                         if field not in first_order:
