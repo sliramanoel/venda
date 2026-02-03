@@ -102,6 +102,10 @@ export const ordersApi = {
   updateStatus: async (orderId, status) => {
     const response = await axios.patch(`${API}/orders/${orderId}/status`, { status });
     return response.data;
+  },
+  validate: async (data) => {
+    const response = await axios.post(`${API}/orders/validate`, data);
+    return response.data;
   }
 };
 
