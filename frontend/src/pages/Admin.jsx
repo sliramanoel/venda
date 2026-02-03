@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Save, Image, Settings, RefreshCw, CheckCircle2, Link as LinkIcon, 
   Package, Palette, Type, MessageSquare, Star, HelpCircle, Users,
-  Plus, Trash2, GripVertical, Eye, Upload, LogOut, User, Loader2
+  Plus, Trash2, GripVertical, Eye, Upload, LogOut, User, Loader2, CreditCard
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Switch } from '../components/ui/switch';
 import { settingsApi, imagesApi, ordersApi, authApi, uploadsApi, paymentsApi } from '../services/api';
+import ImageUploader from '../components/ImageUploader';
 
 const Admin = () => {
   const navigate = useNavigate();
