@@ -112,11 +112,14 @@ backend:
     file: "routers/settings.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Implementado e testado manualmente via curl"
+      - working: true
+        agent: "testing"
+        comment: "✅ APROVADO - Retorna todos os campos obrigatórios: name, tagline, description, phone, email, instagram, paymentLink. Endpoint funcionando perfeitamente."
 
   - task: "PUT /api/settings - Atualizar configurações do site"
     implemented: true
@@ -124,11 +127,14 @@ backend:
     file: "routers/settings.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Implementado com atualização parcial de campos"
+      - working: true
+        agent: "testing"
+        comment: "✅ APROVADO - Atualização parcial funcionando corretamente. Testado com name='NeuroVita Teste' e tagline='Memória Testada', ambos atualizados com sucesso."
 
   - task: "GET /api/images - Retornar URLs das imagens"
     implemented: true
@@ -136,11 +142,14 @@ backend:
     file: "routers/images.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Implementado e testado manualmente via curl"
+      - working: true
+        agent: "testing"
+        comment: "✅ APROVADO - Retorna corretamente URLs: main, secondary, tertiary. Todas as imagens estão sendo servidas adequadamente."
 
   - task: "PUT /api/images - Atualizar URLs das imagens"
     implemented: true
@@ -148,11 +157,14 @@ backend:
     file: "routers/images.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Implementado com atualização parcial de campos"
+      - working: true
+        agent: "testing"
+        comment: "✅ APROVADO - Atualização parcial de URLs funcionando corretamente. Testado main e secondary URLs atualizadas com sucesso."
 
   - task: "POST /api/orders - Criar pedido"
     implemented: true
@@ -160,11 +172,14 @@ backend:
     file: "routers/orders.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Testado via curl e frontend - 2 pedidos criados com sucesso"
+      - working: true
+        agent: "testing"
+        comment: "✅ APROVADO - Criação de pedido funcionando perfeitamente. Testado com dados completos do cliente, gera orderNumber único (NV-20260203-S0U9ZU), status inicial 'pending', todos os campos validados corretamente."
 
   - task: "GET /api/orders - Listar pedidos"
     implemented: true
@@ -172,11 +187,14 @@ backend:
     file: "routers/orders.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Implementado com ordenação por data decrescente"
+      - working: true
+        agent: "testing"
+        comment: "✅ APROVADO - Listagem de pedidos funcionando corretamente. Retorna array com todos os campos obrigatórios: _id, orderNumber, name, email, status, createdAt. Ordenação por data decrescente confirmada."
 
   - task: "GET /api/orders/:id - Buscar pedido específico"
     implemented: true
@@ -184,11 +202,14 @@ backend:
     file: "routers/orders.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Implementado - aceita ID ou número do pedido"
+      - working: true
+        agent: "testing"
+        comment: "✅ APROVADO - Busca por ID funcionando perfeitamente. Testado busca por _id e por orderNumber. Ambos retornam o pedido correto."
 
   - task: "PATCH /api/orders/:id/status - Atualizar status do pedido"
     implemented: true
@@ -196,11 +217,14 @@ backend:
     file: "routers/orders.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Implementado com validação de status enum"
+      - working: true
+        agent: "testing"
+        comment: "✅ APROVADO - Atualização de status funcionando perfeitamente. Testado todos os status válidos: pending -> paid -> shipped -> delivered. Validação de status inválido (422) funcionando corretamente."
 
 metadata:
   created_by: "main_agent"
