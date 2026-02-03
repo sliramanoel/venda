@@ -7,6 +7,8 @@ import httpx
 import logging
 import base64
 import hashlib
+import io
+import qrcode
 
 from models import OrderStatus
 
@@ -41,41 +43,87 @@ async def get_payment_settings():
     
     return settings
 
-def generate_pix_code(order_id: str, amount: float, merchant_name: str = "NEUROVITA") -> str:
-    """Generate a valid PIX EMV code for testing"""
-    # PIX EMV format (simplified)
-    # This generates a valid static PIX code format
-    pix_key = f"neurovita{order_id[-8:]}"  # Simulated PIX key
+def generate_pix_emv_code(order_id: str, amount: float, merchant_name: str = "NEUROVITA") -> str:
+    """
+    Generate a valid PIX EMV code (BR Code)
+    This follows the EMV QR Code specification for PIX
+    """
+    def format_field(id: str, value: str) -> str:
+        return f"{id}{len(value):02d}{value}"
     
-    # EMV format components
-    payload_format = "000201"  # Payload Format Indicator
-    merchant_account = f"26580014br.gov.bcb.pix0136{pix_key}@neurovita.com.br"
-    merchant_category = "52040000"  # Merchant Category Code
-    currency = "5303986"  # Transaction Currency (986 = BRL)
-    amount_str = f"54{len(f'{amount:.2f}'):02d}{amount:.2f}"
-    country = "5802BR"
-    merchant = f"59{len(merchant_name):02d}{merchant_name}"
-    city = "60{:02d}{}".format(len("SAO PAULO"), "SAO PAULO")
+    # PIX key (simulated - in production use real PIX key)
+    pix_key = f"teste{order_id[-6:]}@neurovita.pix"
     
-    # Build payload
-    payload = payload_format + merchant_account + merchant_category + currency + amount_str + country + merchant + city
+    # Build the merchant account info (ID 26)
+    gui = format_field("00", "br.gov.bcb.pix")
+    chave = format_field("01", pix_key)
+    merchant_account = format_field("26", gui + chave)
     
-    # Add CRC16 (simplified)
-    crc = "6304" + hashlib.md5(payload.encode()).hexdigest()[:4].upper()
+    # Build the full payload
+    payload_format = format_field("00", "01")  # Payload Format Indicator
+    merchant_category = format_field("52", "0000")  # Merchant Category Code (0000 = not informed)
+    currency = format_field("53", "986")  # Transaction Currency (986 = BRL)
+    amount_field = format_field("54", f"{amount:.2f}")  # Transaction Amount
+    country = format_field("58", "BR")  # Country Code
+    merchant_name_field = format_field("59", merchant_name[:25])  # Merchant Name (max 25 chars)
+    city = format_field("60", "SAO PAULO")  # Merchant City
     
-    return payload + crc
+    # Additional data (ID 62)
+    txid = format_field("05", f"NV{order_id[-8:].upper()}")
+    additional_data = format_field("62", txid)
+    
+    # Assemble payload without CRC
+    payload = (
+        payload_format +
+        merchant_account +
+        merchant_category +
+        currency +
+        amount_field +
+        country +
+        merchant_name_field +
+        city +
+        additional_data +
+        "6304"  # CRC field ID and length placeholder
+    )
+    
+    # Calculate CRC16 CCITT
+    def crc16_ccitt(data: bytes) -> int:
+        crc = 0xFFFF
+        for byte in data:
+            crc ^= byte << 8
+            for _ in range(8):
+                if crc & 0x8000:
+                    crc = (crc << 1) ^ 0x1021
+                else:
+                    crc <<= 1
+                crc &= 0xFFFF
+        return crc
+    
+    crc = crc16_ccitt(payload.encode('utf-8'))
+    pix_code = payload + f"{crc:04X}"
+    
+    return pix_code
 
-def generate_qr_svg(pix_code: str) -> str:
-    """Generate a simple QR code placeholder SVG"""
-    # For now, return a placeholder that shows the PIX code
-    # In production, use a proper QR code library
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
-        <rect width="200" height="200" fill="white"/>
-        <rect x="10" y="10" width="180" height="180" fill="#f0f0f0" rx="10"/>
-        <text x="100" y="90" text-anchor="middle" font-size="14" fill="#333">PIX QR Code</text>
-        <text x="100" y="115" text-anchor="middle" font-size="10" fill="#666">Copie o código abaixo</text>
-    </svg>'''
-    return "data:image/svg+xml;base64," + base64.b64encode(svg.encode()).decode()
+def generate_qr_code_base64(data: str) -> str:
+    """Generate QR code as base64 data URI"""
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+    
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convert to base64
+    buffer = io.BytesIO()
+    img.save(buffer, format='PNG')
+    buffer.seek(0)
+    img_base64 = base64.b64encode(buffer.getvalue()).decode()
+    
+    return f"data:image/png;base64,{img_base64}"
 
 @router.post("/pix/generate")
 async def generate_pix_payment(order_id: str):
