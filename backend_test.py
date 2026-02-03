@@ -280,18 +280,33 @@ class NeuroVitaAPITest:
         """Test invalid endpoints return 404"""
         log_info("Testing invalid endpoints...")
         
+        # Test 404 endpoints (should fail and we expect them to fail)
         invalid_endpoints = [
-            '/nonexistent',
-            '/orders/invalid-id',
-            '/settings/nonexistent'
+            ('/nonexistent', 404),
+            ('/orders/invalid-id', 404),
+            ('/settings/nonexistent', 404)
         ]
         
-        for endpoint in invalid_endpoints:
-            response = self.make_request('GET', endpoint, expected_status=404)
-            if response is None:  # Expected to fail with 404
-                self.test_results['failed'] -= 1  # Adjust counter since this failure is expected
-                self.test_results['passed'] += 1
-                log_success(f"Invalid endpoint {endpoint} correctly returned 404")
+        for endpoint, expected_status in invalid_endpoints:
+            url = f"{BACKEND_URL}{endpoint}"
+            try:
+                response = self.session.get(url)
+                if response.status_code == expected_status:
+                    log_success(f"Invalid endpoint {endpoint} correctly returned {expected_status}")
+                else:
+                    log_error(f"Invalid endpoint {endpoint} returned {response.status_code}, expected {expected_status}")
+            except Exception as e:
+                log_error(f"Error testing invalid endpoint {endpoint}: {str(e)}")
+                
+        # Test invalid order status update 
+        log_info("Testing invalid order status...")
+        invalid_status_data = {"status": "invalid_status"}
+        response = self.session.patch(f"{BACKEND_URL}/orders/507f1f77bcf86cd799439011/status", 
+                                    json=invalid_status_data)
+        if response.status_code == 422:  # Validation error expected
+            log_success("Invalid status correctly rejected with 422")
+        else:
+            log_warning(f"Invalid status returned {response.status_code}, expected 422")
 
     def run_all_tests(self):
         """Run all API tests"""
