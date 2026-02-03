@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
 import { paymentsApi, ordersApi } from '../services/api';
+import { trackPurchase, trackCompleteRegistration } from '../utils/tracking';
 
 const Pagamento = () => {
   const { orderId } = useParams();
@@ -17,6 +18,7 @@ const Pagamento = () => {
   const [copied, setCopied] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState('pending');
   const [timeLeft, setTimeLeft] = useState(30 * 60); // 30 min
+  const [hasTrackedPurchase, setHasTrackedPurchase] = useState(false);
 
   // Load order and generate PIX
   useEffect(() => {
@@ -24,6 +26,21 @@ const Pagamento = () => {
       try {
         const orderData = await ordersApi.get(orderId);
         setOrder(orderData);
+        
+        // Track Purchase/CompleteRegistration when order is loaded
+        if (!hasTrackedPurchase && orderData) {
+          trackPurchase({
+            productName: 'NeuroVita',
+            optionId: String(orderData.quantity || 1),
+            totalPrice: orderData.totalPrice || 0,
+            orderId: orderData.orderNumber || orderId
+          });
+          trackCompleteRegistration({
+            productName: 'NeuroVita',
+            totalPrice: orderData.totalPrice || 0
+          });
+          setHasTrackedPurchase(true);
+        }
         
         if (orderData.status === 'paid') {
           setPaymentStatus('paid');
