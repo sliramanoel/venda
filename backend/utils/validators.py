@@ -97,16 +97,14 @@ def validate_brazilian_phone(phone: str) -> Tuple[bool, str]:
         if re.match(pattern, clean_phone):
             return False, "Número de telefone inválido"
     
-    # Check for repeated digits (more than 5 same digits in a row)
-    if re.search(r'(\d)\1{5,}', clean_phone):
+    # Check for repeated digits (more than 6 same digits in a row)
+    if re.search(r'(\d)\1{6,}', clean_phone):
         return False, "Número de telefone inválido"
     
-    # Check for sequential patterns
-    sequential_asc = '0123456789'
-    sequential_desc = '9876543210'
-    if any(seq in clean_phone for seq in [sequential_asc[i:i+6] for i in range(5)]):
-        return False, "Número de telefone inválido"
-    if any(seq in clean_phone for seq in [sequential_desc[i:i+6] for i in range(5)]):
+    # Check for obvious sequential patterns only
+    obvious_sequences = ['12345678', '87654321', '01234567', '98765432']
+    number_only = clean_phone[2:]  # Without DDD
+    if number_only in obvious_sequences:
         return False, "Número de telefone inválido"
     
     return True, ""
