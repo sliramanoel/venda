@@ -268,6 +268,31 @@ const Vendas = () => {
       return;
     }
 
+    // Check for validation errors
+    const hasErrors = Object.values(fieldErrors).some(error => error !== null);
+    if (hasErrors) {
+      toast.error('Por favor, corrija os erros nos campos destacados.');
+      return;
+    }
+
+    // Final validation before submit
+    try {
+      const validationResult = await ordersApi.validate({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone
+      });
+      
+      if (!validationResult.valid) {
+        setFieldErrors(prev => ({ ...prev, ...validationResult.errors }));
+        const firstError = Object.values(validationResult.errors)[0];
+        toast.error(firstError || 'Por favor, corrija os dados informados.');
+        return;
+      }
+    } catch (error) {
+      console.error('Validation error:', error);
+    }
+
     setSubmitting(true);
 
     try {
