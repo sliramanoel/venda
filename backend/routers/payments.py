@@ -187,8 +187,14 @@ async def generate_pix_payment(order_id: str):
                     data = response.json()
                     pix_data = data.get("data", data)
                     pix_code = pix_data.get("pixCode")
-                    qr_code = pix_data.get("qrCode")
+                    qr_code = pix_data.get("qrCode")  # OrionPay returns URL
                     transaction_id = pix_data.get("id")
+                    # Use expiration from OrionPay if available
+                    if pix_data.get("expiresAt"):
+                        try:
+                            pix_expiration = datetime.fromisoformat(pix_data["expiresAt"].replace("Z", "+00:00")).replace(tzinfo=None)
+                        except:
+                            pass
                 else:
                     logger.warning(f"OrionPay error: {response.status_code} - {response.text}")
         except Exception as e:
