@@ -26,6 +26,8 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("brand");
   const [currentUser, setCurrentUser] = useState(null);
+  const [orderFilter, setOrderFilter] = useState('all'); // 'all', 'paid', 'pending'
+  const [orderSort, setOrderSort] = useState('newest'); // 'newest', 'oldest'
 
   useEffect(() => {
     // Check authentication
