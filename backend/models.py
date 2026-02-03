@@ -55,6 +55,13 @@ class SettingsBase(BaseModel):
     logoUrl: str = ""
     faviconUrl: str = ""
     
+    # Theme / Colors
+    primaryColor: str = "#059669"  # emerald-600
+    primaryColorLight: str = "#d1fae5"  # emerald-100
+    primaryColorDark: str = "#047857"  # emerald-700
+    secondaryColor: str = "#0d9488"  # teal-600
+    accentColor: str = "#f59e0b"  # amber-500
+    
     # Contact
     phone: str = "(11) 99999-9999"
     email: str = "contato@neurovita.com.br"
