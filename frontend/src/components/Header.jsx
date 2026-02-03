@@ -70,7 +70,13 @@ export const Header = () => {
               {settings?.logoUrl ? (
                 <img src={settings.logoUrl} alt={settings.siteName} className="h-8 sm:h-10 object-contain" />
               ) : (
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:shadow-emerald-500/40 transition-shadow duration-300">
+                <div 
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shadow-lg transition-shadow duration-300"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${settings?.primaryColor || '#059669'}, ${settings?.secondaryColor || '#0d9488'})`,
+                    boxShadow: `0 10px 15px -3px ${settings?.primaryColor || '#059669'}40`
+                  }}
+                >
                   <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
               )}
