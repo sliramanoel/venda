@@ -54,6 +54,7 @@ const AppContent = () => {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/comprar" element={<Vendas />} />
           <Route path="/pagamento/:orderId" element={<Pagamento />} />
+          <Route path="/sucesso/:orderId" element={<Sucesso />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/login" element={<Login />} />
         </Routes>
