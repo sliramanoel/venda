@@ -69,7 +69,14 @@ collect_info() {
 update_system() {
     print_header "Atualizando Sistema"
     
-    apt update && apt upgrade -y
+    # Corrigir possíveis problemas de lock
+    rm -f /var/lib/dpkg/lock-frontend /var/lib/apt/lists/lock /var/cache/apt/archives/lock 2>/dev/null || true
+    dpkg --configure -a 2>/dev/null || true
+    
+    # Configurar para não perguntar durante atualizações
+    export DEBIAN_FRONTEND=noninteractive
+    
+    apt update && apt upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
     apt install -y curl wget git build-essential software-properties-common
     
     print_success "Sistema atualizado"
