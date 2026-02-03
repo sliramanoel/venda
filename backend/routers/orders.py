@@ -8,6 +8,7 @@ import random
 import string
 
 from models import OrderCreate, OrderResponse, OrderStatus, OrderStatusUpdate
+from utils.validators import validate_brazilian_phone, validate_email, validate_name
 
 router = APIRouter(prefix="/api/orders", tags=["orders"])
 
@@ -24,8 +25,23 @@ def generate_order_number():
 
 @router.post("", response_model=OrderResponse)
 async def create_order(order: OrderCreate):
-    """Create a new order"""
+    """Create a new order with validation"""
     db = get_db()
+    
+    # Validate name
+    is_valid, error_msg = validate_name(order.name)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=f"Nome inválido: {error_msg}")
+    
+    # Validate phone
+    is_valid, error_msg = validate_brazilian_phone(order.phone)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=f"Telefone inválido: {error_msg}")
+    
+    # Validate email
+    is_valid, error_msg = validate_email(order.email)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=f"Email inválido: {error_msg}")
     
     order_data = order.model_dump()
     order_data["orderNumber"] = generate_order_number()
