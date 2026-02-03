@@ -245,6 +245,15 @@ const Pagamento = () => {
               </div>
             ) : pixData ? (
               <>
+                {/* Test Mode Warning */}
+                {pixData.testMode && (
+                  <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-center">
+                    <p className="text-sm text-amber-700">
+                      <span className="font-medium">Modo de Teste:</span> Este QR Code é apenas para demonstração.
+                    </p>
+                  </div>
+                )}
+                
                 {/* QR Code */}
                 {pixData.qrCode && (
                   <div className="flex justify-center mb-6">
