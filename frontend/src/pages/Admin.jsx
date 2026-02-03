@@ -874,52 +874,192 @@ const Admin = () => {
           <TabsContent value="orders">
             <Card className="border-0 shadow-lg">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Package className="w-5 h-5 text-emerald-600" /> Pedidos ({orders.length})</CardTitle>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Package className="w-5 h-5 text-emerald-600" /> 
+                    Pedidos ({orders.length})
+                  </CardTitle>
+                  
+                  {/* Filters */}
+                  <div className="flex flex-wrap gap-2">
+                    <select
+                      value={orderFilter}
+                      onChange={(e) => setOrderFilter(e.target.value)}
+                      className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      <option value="all">Todos</option>
+                      <option value="paid">Pagos</option>
+                      <option value="pending">Pendentes</option>
+                    </select>
+                    <select
+                      value={orderSort}
+                      onChange={(e) => setOrderSort(e.target.value)}
+                      className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                      <option value="newest">Mais recentes</option>
+                      <option value="oldest">Mais antigos</option>
+                    </select>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                {orders.length === 0 ? (
-                  <div className="text-center py-12 text-slate-500">
-                    <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>Nenhum pedido ainda</p>
+                {/* Summary Cards */}
+                {orders.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                    <div className="p-4 bg-slate-50 rounded-xl text-center">
+                      <p className="text-2xl font-bold text-slate-900">{orders.length}</p>
+                      <p className="text-xs text-slate-500">Total Pedidos</p>
+                    </div>
+                    <div className="p-4 bg-emerald-50 rounded-xl text-center">
+                      <p className="text-2xl font-bold text-emerald-600">
+                        {orders.filter(o => o.status === 'paid').length}
+                      </p>
+                      <p className="text-xs text-emerald-600">Pagos</p>
+                    </div>
+                    <div className="p-4 bg-amber-50 rounded-xl text-center">
+                      <p className="text-2xl font-bold text-amber-600">
+                        {orders.filter(o => o.status === 'pending').length}
+                      </p>
+                      <p className="text-xs text-amber-600">Pendentes</p>
+                    </div>
+                    <div className="p-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl text-center">
+                      <p className="text-2xl font-bold text-white">
+                        R$ {orders.filter(o => o.status === 'paid').reduce((sum, o) => sum + (o.totalPrice || 0), 0).toFixed(2)}
+                      </p>
+                      <p className="text-xs text-emerald-100">Total Vendas</p>
+                    </div>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {orders.map((order) => (
-                      <div key={order._id} className="p-4 border border-slate-200 rounded-xl hover:border-emerald-200 transition-colors">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                          <div>
-                            <span className="font-semibold text-slate-900">{order.orderNumber}</span>
-                            <span className="text-slate-400 text-sm ml-2">{new Date(order.createdAt).toLocaleDateString('pt-BR')}</span>
+                )}
+
+                {/* Orders List */}
+                {(() => {
+                  // Filter orders
+                  let filteredOrders = [...orders];
+                  if (orderFilter === 'paid') {
+                    filteredOrders = filteredOrders.filter(o => o.status === 'paid');
+                  } else if (orderFilter === 'pending') {
+                    filteredOrders = filteredOrders.filter(o => o.status === 'pending');
+                  }
+                  
+                  // Sort orders
+                  filteredOrders.sort((a, b) => {
+                    const dateA = new Date(a.createdAt);
+                    const dateB = new Date(b.createdAt);
+                    return orderSort === 'newest' ? dateB - dateA : dateA - dateB;
+                  });
+
+                  if (filteredOrders.length === 0) {
+                    return (
+                      <div className="text-center py-12 text-slate-500">
+                        <Package className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p>{orderFilter === 'all' ? 'Nenhum pedido ainda' : `Nenhum pedido ${orderFilter === 'paid' ? 'pago' : 'pendente'}`}</p>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="space-y-3">
+                      {filteredOrders.map((order, index) => (
+                        <div 
+                          key={order._id} 
+                          className={`p-4 border rounded-xl transition-all hover:shadow-md ${
+                            order.status === 'paid' 
+                              ? 'border-emerald-200 bg-emerald-50/30' 
+                              : 'border-slate-200 hover:border-amber-200'
+                          }`}
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                            <div className="flex items-center gap-3">
+                              <span className="text-slate-400 text-sm font-mono">#{filteredOrders.length - index}</span>
+                              <div>
+                                <span className="font-semibold text-slate-900">{order.orderNumber}</span>
+                                <span className="text-slate-400 text-sm ml-2">
+                                  {new Date(order.createdAt).toLocaleDateString('pt-BR', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+                            {getStatusBadge(order.status)}
                           </div>
-                          {getStatusBadge(order.status)}
+                          
+                          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm">
+                            <div>
+                              <span className="text-slate-500">Cliente:</span>{' '}
+                              <span className="text-slate-900 font-medium">{order.name}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500">Email:</span>{' '}
+                              <span className="text-slate-900">{order.email}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500">Telefone:</span>{' '}
+                              <span className="text-slate-900">{order.phone}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-500">Total:</span>{' '}
+                              <span className="text-emerald-600 font-bold">R$ {order.totalPrice?.toFixed(2)}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="mt-2 text-sm text-slate-500">
+                            <span className="text-slate-400">Endereço:</span>{' '}
+                            {order.address}, {order.number} - {order.neighborhood}, {order.city}/{order.state}
+                          </div>
+                          
+                          {order.status === 'pending' && (
+                            <div className="mt-3 pt-3 border-t border-slate-200 flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={async () => {
+                                  try {
+                                    await paymentsApi.simulatePayment(order._id);
+                                    toast.success('Pagamento confirmado!');
+                                    loadData();
+                                  } catch (error) {
+                                    toast.error('Erro ao confirmar pagamento');
+                                  }
+                                }}
+                                className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                              >
+                                <CreditCard className="w-4 h-4 mr-2" />
+                                Confirmar Pagamento
+                              </Button>
+                            </div>
+                          )}
                         </div>
-                        <div className="grid sm:grid-cols-2 gap-2 text-sm">
-                          <div><span className="text-slate-500">Cliente:</span> <span className="text-slate-900">{order.name}</span></div>
-                          <div><span className="text-slate-500">Telefone:</span> <span className="text-slate-900">{order.phone}</span></div>
-                          <div><span className="text-slate-500">Opção:</span> <span className="text-slate-900">{getQuantityLabel(order.quantity)}</span></div>
-                          <div><span className="text-slate-500">Total:</span> <span className="text-emerald-600 font-semibold">R$ {order.totalPrice.toFixed(2)}</span></div>
-                        </div>
-                        <div className="mt-2 text-sm text-slate-500">
-                          {order.address}, {order.number} - {order.neighborhood}, {order.city}/{order.state}
-                        </div>
-                        {order.status === 'pending' && (
-                          <div className="mt-3 pt-3 border-t">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={async () => {
-                                try {
-                                  await paymentsApi.simulatePayment(order._id);
-                                  toast.success('Pagamento simulado com sucesso!');
-                                  loadData(); // Reload orders
-                                } catch (error) {
-                                  toast.error('Erro ao simular pagamento');
-                                }
-                              }}
-                              className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
-                            >
-                              <CreditCard className="w-4 h-4 mr-2" />
-                              Simular Pagamento
+                      ))}
+                    </div>
+                  );
+                })()}
+
+                {/* Total Sales Summary */}
+                {orders.length > 0 && (
+                  <div className="mt-6 pt-6 border-t border-slate-200">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-slate-900 rounded-xl text-white">
+                      <div>
+                        <h4 className="font-semibold text-lg">Resumo de Vendas</h4>
+                        <p className="text-slate-400 text-sm">Apenas pedidos pagos</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-3xl font-bold text-emerald-400">
+                          R$ {orders.filter(o => o.status === 'paid').reduce((sum, o) => sum + (o.totalPrice || 0), 0).toFixed(2)}
+                        </p>
+                        <p className="text-slate-400 text-sm">
+                          {orders.filter(o => o.status === 'paid').length} pedido(s) confirmado(s)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
                             </Button>
                           </div>
                         )}
