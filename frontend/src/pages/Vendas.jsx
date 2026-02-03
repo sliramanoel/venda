@@ -238,27 +238,16 @@ const Vendas = () => {
 
       const order = await ordersApi.create(orderData);
       
-      toast.success(`Pedido ${order.orderNumber} criado com sucesso!`);
+      toast.success(`Pedido ${order.orderNumber} criado! Redirecionando para pagamento...`);
 
-      // Open payment link if configured
-      if (siteConfig.paymentLink) {
-        window.open(siteConfig.paymentLink, '_blank');
-      } else {
-        toast.info('Link de pagamento será configurado em breve. Entraremos em contato!');
-      }
-
-      // Reset form
-      setFormData({
-        name: '', email: '', phone: '', cep: '', address: '',
-        number: '', complement: '', neighborhood: '', city: '', state: ''
-      });
-      setQuantity(1);
-      setShipping(null);
+      // Redirect to payment page
+      setTimeout(() => {
+        navigate(`/pagamento/${order._id}`);
+      }, 1000);
 
     } catch (error) {
       console.error('Error creating order:', error);
       toast.error('Erro ao criar pedido. Tente novamente.');
-    } finally {
       setSubmitting(false);
     }
   };
