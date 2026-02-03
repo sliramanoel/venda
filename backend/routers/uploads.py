@@ -52,12 +52,23 @@ async def upload_image(file: UploadFile = File(...)):
     with open(file_path, "wb") as f:
         f.write(content)
     
-    # Generate URL
-    base_url = os.environ.get('REACT_APP_BACKEND_URL', '')
-    if not base_url:
-        base_url = os.environ.get('BACKEND_URL', 'http://localhost:8001')
+    # Generate URL - use the external URL for production
+    # Try to get from frontend env first, then fall back to localhost
+    external_url = os.environ.get('EXTERNAL_URL', '')
+    if not external_url:
+        # Read from frontend .env if available
+        frontend_env_path = Path(__file__).parent.parent.parent / "frontend" / ".env"
+        if frontend_env_path.exists():
+            with open(frontend_env_path) as f:
+                for line in f:
+                    if line.startswith('REACT_APP_BACKEND_URL='):
+                        external_url = line.split('=', 1)[1].strip().strip('"\'')
+                        break
     
-    file_url = f"{base_url}/api/uploads/images/{unique_filename}"
+    if not external_url:
+        external_url = 'http://localhost:8001'
+    
+    file_url = f"{external_url}/api/uploads/images/{unique_filename}"
     
     return {
         "success": True,
