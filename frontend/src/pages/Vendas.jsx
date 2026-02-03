@@ -7,6 +7,15 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { toast } from 'sonner';
 import { settingsApi, imagesApi, ordersApi } from '../services/api';
+import SEOHead from '../components/SEOHead';
+import { 
+  trackViewContent, 
+  trackAddToCart, 
+  trackInitiateCheckout, 
+  trackAddPaymentInfo,
+  trackLead,
+  getOrderUTMParams 
+} from '../utils/tracking';
 
 const shippingRates = {
   sudeste: { min: 15.90, max: 22.90, days: "3 a 5" },
