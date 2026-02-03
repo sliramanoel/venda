@@ -481,11 +481,18 @@ const Vendas = () => {
                           name="name"
                           value={formData.name}
                           onChange={handleInputChange}
+                          onBlur={handleBlur}
                           placeholder="Seu nome completo"
-                          className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
+                          className={`mt-1.5 h-11 sm:h-10 text-base sm:text-sm ${fieldErrors.name ? 'border-red-500 focus:ring-red-500' : ''}`}
                           required
                           data-testid="input-name"
                         />
+                        {fieldErrors.name && (
+                          <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3" />
+                            {fieldErrors.name}
+                          </p>
+                        )}
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
@@ -496,11 +503,18 @@ const Vendas = () => {
                             type="email"
                             value={formData.email}
                             onChange={handleInputChange}
+                            onBlur={handleBlur}
                             placeholder="seu@email.com"
-                            className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
+                            className={`mt-1.5 h-11 sm:h-10 text-base sm:text-sm ${fieldErrors.email ? 'border-red-500 focus:ring-red-500' : ''}`}
                             required
                             data-testid="input-email"
                           />
+                          {fieldErrors.email && (
+                            <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3" />
+                              {fieldErrors.email}
+                            </p>
+                          )}
                         </div>
                         <div>
                           <Label htmlFor="phone" className="text-sm">Telefone *</Label>
@@ -509,11 +523,18 @@ const Vendas = () => {
                             name="phone"
                             value={formData.phone}
                             onChange={handleInputChange}
+                            onBlur={handleBlur}
                             placeholder="(00) 00000-0000"
-                            className="mt-1.5 h-11 sm:h-10 text-base sm:text-sm"
+                            className={`mt-1.5 h-11 sm:h-10 text-base sm:text-sm ${fieldErrors.phone ? 'border-red-500 focus:ring-red-500' : ''}`}
                             required
                             data-testid="input-phone"
                           />
+                          {fieldErrors.phone && (
+                            <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3" />
+                              {fieldErrors.phone}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
