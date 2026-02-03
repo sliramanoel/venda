@@ -207,6 +207,9 @@ const Admin = () => {
             <TabsTrigger value="seo" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs">
               <BarChart3 className="w-4 h-4 mr-1" /> Meta Ads
             </TabsTrigger>
+            <TabsTrigger value="payments" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs">
+              <CreditCard className="w-4 h-4 mr-1" /> Pagamentos
+            </TabsTrigger>
             <TabsTrigger value="orders" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs">
               <Package className="w-4 h-4 mr-1" /> Pedidos
             </TabsTrigger>
