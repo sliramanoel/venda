@@ -3,6 +3,64 @@ import axios from 'axios';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Create axios instance with auth interceptor
+const apiClient = axios.create({
+  baseURL: API,
+});
+
+// Add auth token to requests
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Handle 401 responses
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      // Don't redirect automatically, let components handle it
+    }
+    return Promise.reject(error);
+  }
+);
+
+// Auth API
+export const authApi = {
+  login: async (email, password) => {
+    const response = await axios.post(`${API}/auth/login`, { email, password });
+    return response.data;
+  },
+  register: async (name, email, password) => {
+    const response = await axios.post(`${API}/auth/register`, { name, email, password });
+    return response.data;
+  },
+  verify: async () => {
+    const response = await apiClient.post('/auth/verify');
+    return response.data;
+  },
+  getMe: async () => {
+    const response = await apiClient.get('/auth/me');
+    return response.data;
+  },
+  logout: () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+  },
+  isAuthenticated: () => {
+    return !!localStorage.getItem('auth_token');
+  },
+  getUser: () => {
+    const user = localStorage.getItem('auth_user');
+    return user ? JSON.parse(user) : null;
+  }
+};
+
 // Settings API
 export const settingsApi = {
   get: async () => {
@@ -10,7 +68,7 @@ export const settingsApi = {
     return response.data;
   },
   update: async (data) => {
-    const response = await axios.put(`${API}/settings`, data);
+    const response = await apiClient.put('/settings', data);
     return response.data;
   }
 };
