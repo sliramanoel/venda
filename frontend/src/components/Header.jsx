@@ -93,9 +93,13 @@ export const Header = () => {
                   to={link.path}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive(link.path)
-                      ? 'text-emerald-600 bg-emerald-50'
-                      : 'text-slate-600 hover:text-emerald-600 hover:bg-slate-50'
+                      ? 'text-slate-600 hover:bg-slate-50'
+                      : 'text-slate-600 hover:bg-slate-50'
                   }`}
+                  style={isActive(link.path) ? {
+                    color: settings?.primaryColor || '#059669',
+                    backgroundColor: settings?.primaryColorLight || '#d1fae5'
+                  } : {}}
                 >
                   {link.label}
                 </Link>
@@ -105,7 +109,13 @@ export const Header = () => {
             {/* Desktop CTA Button */}
             <div className="hidden md:block">
               <Link to="/comprar">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/40 transition-all duration-300">
+                <Button 
+                  className="text-white shadow-lg transition-all duration-300"
+                  style={{ 
+                    backgroundColor: settings?.primaryColor || '#059669',
+                    boxShadow: `0 10px 15px -3px ${settings?.primaryColor || '#059669'}40`
+                  }}
+                >
                   {settings?.hero?.ctaText || 'Experimente Grátis'}
                 </Button>
               </Link>
