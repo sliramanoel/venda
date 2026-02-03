@@ -162,6 +162,12 @@ REACT_APP_BACKEND_URL=https://neurovita-sales.preview.emergentagent.com
     - Max 5MB file size
     - Admin panel with URL/Upload toggle
     - Image serving with caching
+14. ✅ **Input Validation Anti-Spam** - Dec 2025
+    - Brazilian phone number validation (DDD + format)
+    - Disposable email domain blocking (50+ domains)
+    - Real-time validation on blur
+    - Name validation (first + last name required)
+    - Fake pattern detection (repeated digits, sequential numbers)
 
 ## Backlog / Future Enhancements
 
