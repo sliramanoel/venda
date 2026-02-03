@@ -57,35 +57,94 @@ Após a instalação:
 # Instalar Docker
 curl -fsSL https://get.docker.com | sh
 
-# Instalar Docker Compose
-apt install docker-compose-plugin
+# Adicionar usuário ao grupo docker (opcional)
+usermod -aG docker $USER
+
+# Verificar instalação
+docker --version
+docker compose version
 ```
 
-### 2. Configurar Variáveis de Ambiente
+### 2. Baixar o Projeto
 
 ```bash
-# Criar arquivo .env
-cat > .env << EOF
+# Clonar o repositório
+git clone https://github.com/seu-usuario/neurovita.git
+cd neurovita
+```
+
+### 3. Configurar Variáveis de Ambiente
+
+```bash
+# Copiar arquivo de exemplo
+cp .env.example .env
+
+# Editar com seus valores
+nano .env
+```
+
+Preencha os valores no arquivo `.env`:
+```env
 REACT_APP_BACKEND_URL=https://seu-dominio.com
 CORS_ORIGINS=https://seu-dominio.com
 ORIONPAY_API_KEY=sua-api-key
 JWT_SECRET_KEY=$(openssl rand -base64 64)
-EOF
 ```
 
-### 3. Iniciar os Containers
+### 4. Iniciar os Containers
 
 ```bash
-# Build e start
+# Build e start (primeira vez)
 docker compose up -d --build
 
-# Ver logs
+# Ver logs em tempo real
 docker compose logs -f
+
+# Ver status dos containers
+docker compose ps
 ```
 
-### 4. Configurar Nginx Externo (para SSL)
+### 5. Configurar SSL com Certbot (Recomendado)
 
-Se quiser usar SSL, configure um Nginx externo ou use Traefik.
+Para SSL em produção, instale Certbot no host:
+
+```bash
+# Instalar Certbot
+apt install certbot
+
+# Parar temporariamente o container frontend
+docker compose stop frontend
+
+# Obter certificado
+certbot certonly --standalone -d seu-dominio.com -d www.seu-dominio.com
+
+# Reiniciar frontend
+docker compose start frontend
+```
+
+**Alternativa**: Use um proxy reverso como Traefik ou Caddy que gerencia SSL automaticamente.
+
+### Comandos Docker Úteis
+
+```bash
+# Reiniciar todos os serviços
+docker compose restart
+
+# Reiniciar apenas o backend
+docker compose restart backend
+
+# Ver logs do backend
+docker compose logs -f backend
+
+# Parar tudo
+docker compose down
+
+# Parar e remover volumes (CUIDADO: apaga dados!)
+docker compose down -v
+
+# Atualizar após mudanças no código
+docker compose up -d --build
+```
 
 ---
 
