@@ -101,3 +101,125 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Site de suplemento natural NeuroVita com página inicial, quem somos, FAQ, página de vendas com calculadora de frete via ViaCEP e botão de pagamento PIX, painel admin para gerenciar configurações, imagens e pedidos.
+
+backend:
+  - task: "GET /api/settings - Retornar configurações do site"
+    implemented: true
+    working: true
+    file: "routers/settings.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implementado e testado manualmente via curl"
+
+  - task: "PUT /api/settings - Atualizar configurações do site"
+    implemented: true
+    working: true
+    file: "routers/settings.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implementado com atualização parcial de campos"
+
+  - task: "GET /api/images - Retornar URLs das imagens"
+    implemented: true
+    working: true
+    file: "routers/images.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implementado e testado manualmente via curl"
+
+  - task: "PUT /api/images - Atualizar URLs das imagens"
+    implemented: true
+    working: true
+    file: "routers/images.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implementado com atualização parcial de campos"
+
+  - task: "POST /api/orders - Criar pedido"
+    implemented: true
+    working: true
+    file: "routers/orders.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Testado via curl e frontend - 2 pedidos criados com sucesso"
+
+  - task: "GET /api/orders - Listar pedidos"
+    implemented: true
+    working: true
+    file: "routers/orders.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implementado com ordenação por data decrescente"
+
+  - task: "GET /api/orders/:id - Buscar pedido específico"
+    implemented: true
+    working: true
+    file: "routers/orders.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implementado - aceita ID ou número do pedido"
+
+  - task: "PATCH /api/orders/:id/status - Atualizar status do pedido"
+    implemented: true
+    working: true
+    file: "routers/orders.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Implementado com validação de status enum"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan: |
+  1. Testar todos os endpoints de settings (GET/PUT)
+  2. Testar endpoints de images (GET/PUT) 
+  3. Testar fluxo completo de criação de pedido
+  4. Testar listagem e busca de pedidos
+  5. Testar atualização de status de pedidos
+
+agent_communication: |
+  Backend implementado com 3 routers:
+  - settings.py: Configurações do site (nome, tagline, contato, link pagamento)
+  - images.py: URLs das imagens do produto
+  - orders.py: CRUD de pedidos com número único e status
+  
+  Todos os endpoints já foram testados manualmente via curl e funcionaram.
+  Frontend integrado e criando pedidos com sucesso.
