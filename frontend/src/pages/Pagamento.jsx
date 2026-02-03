@@ -222,9 +222,9 @@ const Pagamento = () => {
                   <div className="flex justify-center mb-6">
                     <div className="bg-white p-4 rounded-xl shadow-inner border-2 border-slate-100">
                       <img 
-                        src={`data:image/png;base64,${pixData.qrCode}`}
+                        src={pixData.qrCode.startsWith('http') ? pixData.qrCode : `data:image/png;base64,${pixData.qrCode}`}
                         alt="QR Code PIX"
-                        className="w-48 h-48 sm:w-56 sm:h-56"
+                        className="w-48 h-48 sm:w-56 sm:h-56 object-contain"
                       />
                     </div>
                   </div>
