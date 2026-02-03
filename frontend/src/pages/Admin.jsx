@@ -571,6 +571,151 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
+          {/* META ADS / SEO */}
+          <TabsContent value="seo">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><BarChart3 className="w-5 h-5 text-emerald-600" /> Meta Ads & SEO</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                {/* Meta Pixel */}
+                <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" className="w-5 h-5 text-white fill-current">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900">Meta Pixel (Facebook Pixel)</h4>
+                      <p className="text-xs text-slate-600">Rastreia conversões e cria públicos para anúncios</p>
+                    </div>
+                  </div>
+                  <div>
+                    <Label>ID do Pixel</Label>
+                    <Input 
+                      value={settings?.metaPixelId || ''} 
+                      onChange={e => handleSettingsChange('metaPixelId', e.target.value)} 
+                      placeholder="Ex: 123456789012345"
+                      className="mt-1.5 bg-white" 
+                    />
+                    <p className="text-xs text-slate-500 mt-1">
+                      Encontre em: Meta Business Suite → Gerenciador de Eventos → Pixel
+                    </p>
+                  </div>
+                </div>
+
+                {/* Open Graph */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-slate-900 flex items-center gap-2">
+                    <LinkIcon className="w-4 h-4" /> Open Graph (Compartilhamento Social)
+                  </h4>
+                  <p className="text-sm text-slate-600">Define como o link aparece quando compartilhado no Facebook, WhatsApp, etc.</p>
+                  
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Título OG</Label>
+                      <Input 
+                        value={settings?.ogTitle || ''} 
+                        onChange={e => handleSettingsChange('ogTitle', e.target.value)} 
+                        placeholder="Deixe vazio para usar título padrão"
+                        className="mt-1.5" 
+                      />
+                    </div>
+                    <div>
+                      <Label>Imagem OG (URL 1200x630)</Label>
+                      <Input 
+                        value={settings?.ogImage || ''} 
+                        onChange={e => handleSettingsChange('ogImage', e.target.value)} 
+                        placeholder="https://exemplo.com/imagem-share.jpg"
+                        className="mt-1.5" 
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Descrição OG</Label>
+                    <Textarea 
+                      value={settings?.ogDescription || ''} 
+                      onChange={e => handleSettingsChange('ogDescription', e.target.value)} 
+                      placeholder="Descrição que aparece ao compartilhar o link"
+                      className="mt-1.5" 
+                      rows={2}
+                    />
+                  </div>
+
+                  {/* Preview */}
+                  <div className="p-4 bg-slate-100 rounded-xl">
+                    <p className="text-xs text-slate-500 mb-2">Preview do compartilhamento:</p>
+                    <div className="bg-white rounded-lg border overflow-hidden max-w-sm">
+                      {settings?.ogImage && (
+                        <img src={settings.ogImage} alt="OG Preview" className="w-full h-32 object-cover" />
+                      )}
+                      <div className="p-3">
+                        <p className="text-xs text-slate-400 uppercase">{window.location.hostname}</p>
+                        <p className="font-semibold text-slate-900 text-sm">{settings?.ogTitle || settings?.siteName || 'Título do Site'}</p>
+                        <p className="text-xs text-slate-600 line-clamp-2">{settings?.ogDescription || settings?.description || 'Descrição do site'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SEO */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-slate-900 flex items-center gap-2">
+                    <Search className="w-4 h-4" /> SEO (Otimização para Buscadores)
+                  </h4>
+                  
+                  <div>
+                    <Label>Título da Página (Meta Title)</Label>
+                    <Input 
+                      value={settings?.metaTitle || ''} 
+                      onChange={e => handleSettingsChange('metaTitle', e.target.value)} 
+                      placeholder="Deixe vazio para usar nome do site + slogan"
+                      className="mt-1.5" 
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Recomendado: 50-60 caracteres</p>
+                  </div>
+                  
+                  <div>
+                    <Label>Meta Description</Label>
+                    <Textarea 
+                      value={settings?.metaDescription || ''} 
+                      onChange={e => handleSettingsChange('metaDescription', e.target.value)} 
+                      placeholder="Descrição que aparece nos resultados do Google"
+                      className="mt-1.5" 
+                      rows={2}
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Recomendado: 150-160 caracteres</p>
+                  </div>
+                  
+                  <div>
+                    <Label>Palavras-chave</Label>
+                    <Input 
+                      value={settings?.metaKeywords || ''} 
+                      onChange={e => handleSettingsChange('metaKeywords', e.target.value)} 
+                      placeholder="suplemento, memória, concentração, energia"
+                      className="mt-1.5" 
+                    />
+                  </div>
+                </div>
+
+                {/* Tracking Status */}
+                <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                  <h4 className="font-semibold text-emerald-800 mb-2">Eventos Rastreados</h4>
+                  <ul className="text-sm text-emerald-700 space-y-1">
+                    <li>✓ PageView - Visualização de página</li>
+                    <li>✓ ViewContent - Visualização do produto</li>
+                    <li>✓ AddToCart - Seleção de opção</li>
+                    <li>✓ InitiateCheckout - Início do checkout</li>
+                    <li>✓ AddPaymentInfo - Frete calculado</li>
+                    <li>✓ Purchase - Pedido criado</li>
+                    <li>✓ UTM Tracking - Atribuição de campanhas</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* PEDIDOS */}
           <TabsContent value="orders">
             <Card className="border-0 shadow-lg">
