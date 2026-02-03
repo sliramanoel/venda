@@ -93,10 +93,14 @@ install_nodejs() {
 install_python() {
     print_header "Instalando Python 3.11"
     
-    apt install -y python3.11 python3.11-venv python3-pip
+    # Adicionar repositório deadsnakes para Python 3.11
+    add-apt-repository -y ppa:deadsnakes/ppa
+    apt update
+    
+    apt install -y python3.11 python3.11-venv python3.11-dev python3-pip
     
     # Criar link simbólico
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 || true
     
     print_success "Python $(python3 --version) instalado"
 }
