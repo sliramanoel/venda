@@ -277,6 +277,197 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
+          {/* TEMA / CORES */}
+          <TabsContent value="theme">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Paintbrush className="w-5 h-5 text-emerald-600" /> Esquema de Cores</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Color Presets */}
+                <div>
+                  <Label className="mb-3 block">Temas Pré-definidos</Label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                    {[
+                      { name: 'Esmeralda', primary: '#059669', light: '#d1fae5', dark: '#047857' },
+                      { name: 'Azul', primary: '#2563eb', light: '#dbeafe', dark: '#1d4ed8' },
+                      { name: 'Roxo', primary: '#7c3aed', light: '#ede9fe', dark: '#6d28d9' },
+                      { name: 'Rosa', primary: '#db2777', light: '#fce7f3', dark: '#be185d' },
+                      { name: 'Laranja', primary: '#ea580c', light: '#ffedd5', dark: '#c2410c' },
+                      { name: 'Vermelho', primary: '#dc2626', light: '#fee2e2', dark: '#b91c1c' },
+                    ].map((theme) => (
+                      <button
+                        key={theme.name}
+                        type="button"
+                        onClick={() => {
+                          handleSettingsChange('primaryColor', theme.primary);
+                          handleSettingsChange('primaryColorLight', theme.light);
+                          handleSettingsChange('primaryColorDark', theme.dark);
+                        }}
+                        className={`p-3 rounded-xl border-2 transition-all hover:scale-105 ${
+                          settings?.primaryColor === theme.primary 
+                            ? 'border-slate-900 shadow-lg' 
+                            : 'border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <div 
+                          className="w-full h-8 rounded-lg mb-2"
+                          style={{ backgroundColor: theme.primary }}
+                        />
+                        <span className="text-xs font-medium text-slate-700">{theme.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Colors */}
+                <div className="border-t pt-6">
+                  <h4 className="font-semibold mb-4">Cores Personalizadas</h4>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <Label>Cor Principal</Label>
+                      <div className="flex gap-2 mt-1.5">
+                        <input
+                          type="color"
+                          value={settings?.primaryColor || '#059669'}
+                          onChange={e => handleSettingsChange('primaryColor', e.target.value)}
+                          className="w-12 h-10 rounded-lg cursor-pointer border border-slate-200"
+                        />
+                        <Input 
+                          value={settings?.primaryColor || '#059669'} 
+                          onChange={e => handleSettingsChange('primaryColor', e.target.value)}
+                          placeholder="#059669"
+                          className="font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Cor Principal (Clara)</Label>
+                      <div className="flex gap-2 mt-1.5">
+                        <input
+                          type="color"
+                          value={settings?.primaryColorLight || '#d1fae5'}
+                          onChange={e => handleSettingsChange('primaryColorLight', e.target.value)}
+                          className="w-12 h-10 rounded-lg cursor-pointer border border-slate-200"
+                        />
+                        <Input 
+                          value={settings?.primaryColorLight || '#d1fae5'} 
+                          onChange={e => handleSettingsChange('primaryColorLight', e.target.value)}
+                          placeholder="#d1fae5"
+                          className="font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Cor Principal (Escura)</Label>
+                      <div className="flex gap-2 mt-1.5">
+                        <input
+                          type="color"
+                          value={settings?.primaryColorDark || '#047857'}
+                          onChange={e => handleSettingsChange('primaryColorDark', e.target.value)}
+                          className="w-12 h-10 rounded-lg cursor-pointer border border-slate-200"
+                        />
+                        <Input 
+                          value={settings?.primaryColorDark || '#047857'} 
+                          onChange={e => handleSettingsChange('primaryColorDark', e.target.value)}
+                          placeholder="#047857"
+                          className="font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Cor Secundária</Label>
+                      <div className="flex gap-2 mt-1.5">
+                        <input
+                          type="color"
+                          value={settings?.secondaryColor || '#0d9488'}
+                          onChange={e => handleSettingsChange('secondaryColor', e.target.value)}
+                          className="w-12 h-10 rounded-lg cursor-pointer border border-slate-200"
+                        />
+                        <Input 
+                          value={settings?.secondaryColor || '#0d9488'} 
+                          onChange={e => handleSettingsChange('secondaryColor', e.target.value)}
+                          placeholder="#0d9488"
+                          className="font-mono"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Cor de Destaque</Label>
+                      <div className="flex gap-2 mt-1.5">
+                        <input
+                          type="color"
+                          value={settings?.accentColor || '#f59e0b'}
+                          onChange={e => handleSettingsChange('accentColor', e.target.value)}
+                          className="w-12 h-10 rounded-lg cursor-pointer border border-slate-200"
+                        />
+                        <Input 
+                          value={settings?.accentColor || '#f59e0b'} 
+                          onChange={e => handleSettingsChange('accentColor', e.target.value)}
+                          placeholder="#f59e0b"
+                          className="font-mono"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preview */}
+                <div className="border-t pt-6">
+                  <h4 className="font-semibold mb-4">Preview</h4>
+                  <div className="p-6 bg-slate-100 rounded-xl">
+                    <div className="flex flex-wrap gap-3 mb-4">
+                      <button 
+                        className="px-4 py-2 rounded-lg text-white font-medium"
+                        style={{ backgroundColor: settings?.primaryColor || '#059669' }}
+                      >
+                        Botão Principal
+                      </button>
+                      <button 
+                        className="px-4 py-2 rounded-lg text-white font-medium"
+                        style={{ backgroundColor: settings?.primaryColorDark || '#047857' }}
+                      >
+                        Botão Hover
+                      </button>
+                      <button 
+                        className="px-4 py-2 rounded-lg font-medium"
+                        style={{ 
+                          backgroundColor: settings?.primaryColorLight || '#d1fae5',
+                          color: settings?.primaryColorDark || '#047857'
+                        }}
+                      >
+                        Botão Secundário
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-3 items-center">
+                      <span 
+                        className="px-3 py-1 rounded-full text-sm font-medium"
+                        style={{ 
+                          backgroundColor: settings?.primaryColorLight || '#d1fae5',
+                          color: settings?.primaryColorDark || '#047857'
+                        }}
+                      >
+                        Badge
+                      </span>
+                      <span 
+                        className="font-semibold"
+                        style={{ color: settings?.primaryColor || '#059669' }}
+                      >
+                        Texto em destaque
+                      </span>
+                      <span 
+                        className="px-3 py-1 rounded-full text-sm font-medium text-white"
+                        style={{ backgroundColor: settings?.accentColor || '#f59e0b' }}
+                      >
+                        Alerta
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* PRODUTO */}
           <TabsContent value="product">
             <Card className="border-0 shadow-lg">
