@@ -337,6 +337,11 @@ const Vendas = () => {
 
             {/* Order Form - Mobile optimized */}
             <div>
+              {/* Countdown Timer - Urgency */}
+              <div className="mb-4 sm:mb-6">
+                <CountdownTimer />
+              </div>
+
               <Card className="border-0 shadow-xl lg:sticky lg:top-24">
                 <CardContent className="p-4 sm:p-6 md:p-8">
                   <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2">
