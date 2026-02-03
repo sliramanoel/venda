@@ -177,7 +177,8 @@ async def generate_pix_payment(order_id: str):
                     },
                     json={
                         "amount": order["totalPrice"],
-                        "email": order["email"]
+                        "email": order["email"],
+                        "name": order["name"]
                     },
                     timeout=30.0
                 )
