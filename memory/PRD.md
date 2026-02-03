@@ -8,7 +8,7 @@ Plataforma de e-commerce whitelabel completa para venda de produtos, com painel 
 - Lojas que precisam de sistema de pagamento PIX
 - Negócios que anunciam no Meta Ads
 
-## Funcionalidades Principais
+## Funcionalidades Implementadas
 
 ### Sistema Whitelabel
 - [x] Página de vendas dinâmica e configurável
@@ -42,11 +42,43 @@ Plataforma de e-commerce whitelabel completa para venda de produtos, com painel 
 - [x] Proteção contra pedidos falsos
 
 ### Deployment
-- [x] Script install.sh para VPS manual
+- [x] Script install.sh para VPS (v2.0 - testado e corrigido)
 - [x] docker-compose.yml para containerização
 - [x] Dockerfiles para backend e frontend
 - [x] Configuração Nginx para produção
 - [x] Guia de instalação completo (INSTALACAO.md)
+
+---
+
+## Problemas Resolvidos na Instalação (v2.0)
+
+### 1. apt_pkg não encontrado (Ubuntu 22.04/24.04)
+- **Problema:** Symlink apontando para arquitetura errada (aarch64 vs x86_64)
+- **Solução:** Função `fix_apt_pkg()` que detecta e corrige automaticamente
+
+### 2. emergentintegrations no requirements.txt
+- **Problema:** Pacote interno não disponível publicamente
+- **Solução:** Removido e criado requirements.txt simplificado
+
+### 3. Conflito de dependências pip
+- **Problema:** Versões fixas conflitando entre si
+- **Solução:** Requirements.txt com versões mínimas flexíveis
+
+### 4. Nginx SSL antes do Certbot
+- **Problema:** Config com SSL antes dos certificados existirem
+- **Solução:** Config inicial sem SSL, Certbot adiciona depois
+
+### 5. Certbot com erro de Python
+- **Problema:** Incompatibilidade de versão Python
+- **Solução:** Instalação via Snap (mais isolado)
+
+### 6. bcrypt não funciona com www-data
+- **Problema:** Permissões de biblioteca nativa
+- **Solução:** Backend roda como root
+
+### 7. Frontend com URL errada
+- **Problema:** Build compilado com domínio antigo
+- **Solução:** Recompilação após definir .env correto
 
 ---
 
@@ -75,6 +107,14 @@ Plataforma de e-commerce whitelabel completa para venda de produtos, com painel 
 
 ---
 
+## Instalação Testada em Produção
+
+**Domínio:** neurovitanatural.com
+**VPS:** VDSina (Ubuntu 22.04)
+**Data:** Fevereiro 2026
+
+---
+
 ## Backlog (P2)
 - [ ] Refatorar Admin.jsx em componentes menores
 - [ ] Sistema de backup automático MongoDB
@@ -85,5 +125,5 @@ Plataforma de e-commerce whitelabel completa para venda de produtos, com painel 
 ---
 
 ## Última Atualização
-- **Data:** Dezembro 2025
-- **Status:** MVP Completo, scripts de deploy prontos para teste
+- **Data:** 03 de Fevereiro de 2026
+- **Status:** MVP Completo, instalação em VPS testada e funcionando
