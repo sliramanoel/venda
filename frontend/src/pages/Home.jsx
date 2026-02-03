@@ -57,6 +57,25 @@ const testimonials = [
 ];
 
 const Home = () => {
+  const [siteConfig, setSiteConfig] = useState({ description: 'Suplemento natural para potencializar sua memória e disposição diária.' });
+  const [productImages, setProductImages] = useState({ main: '' });
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [settings, images] = await Promise.all([
+          settingsApi.get(),
+          imagesApi.get()
+        ]);
+        setSiteConfig(settings);
+        setProductImages(images);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+    loadData();
+  }, []);
+
   return (
     <div className="min-h-screen">
       {/* Hero Section - Mobile First */}
