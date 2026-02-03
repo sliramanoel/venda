@@ -1,0 +1,141 @@
+<analysis>**original_problem_statement:**
+The user wants to build a sales website for a supplement named NeuroVita, which is intended to improve memory and disposition.
+
+**PRODUCT REQUIREMENTS:**
+1.  **Design:** Modern and clean style.
+2.  **Sales Page:**
+    *   Display product images.
+    *   Offer multiple quantity options with dynamic pricing. Initially, this was a free sample offer, but it evolved to include paid options.
+    *   Include a shipping calculator using a Correios API (ViaCEP was implemented).
+    *   A Finalize button that leads to a PIX payment flow.
+3.  **Product Options & Pricing:**
+    *   Option 1: 2 Amostras Grátis (Customer pays only shipping).
+    *   Option 2: 2 Amostras + 1 Frasco 60 Capsulas for R$ 197,00 + shipping.
+    *   Option 3: 2 Amostras + 2 Frascos 60 capsulas for R$ 394,00 + shipping.
+4.  **Responsiveness:** The site must be responsive, with a primary focus on mobile users.
+5.  **Scarcity:** Add urgency elements to the checkout page, such as a countdown timer and a limited stock indicator.
+6.  **Payment Integration:** Integrate with the OrionPay API for PIX payments. The user provided an API key and documentation link.
+7.  **Admin Panel:**
+    *   Initially, just to change product images.
+    *   **LATEST REQUEST:** Transform the admin panel into a full content management system (CMS) to allow customization of the product name, logo, images, layout, and content, making the site a reusable template for other products.
+
+**User's preferred language**: Portuguese
+
+**what currently exists?**
+A fully functional sales website built with a React frontend and a FastAPI backend. The site is responsive, features dynamic product options, a working shipping calculator (ViaCEP), urgency timers, and is integrated with OrionPay for PIX payment generation. The backend uses an in-memory database for storing orders and settings. The core functionality is complete, but the agent has started a major refactor to turn it into a customizable template.
+
+**Last working item**:
+-   **Last item agent was working:** The agent was in the process of a major refactor to transform the website into a fully customizable template managed from the admin panel. This involves:
+    1.  Expanding the backend  model to include fields for theme, product info, layout, and content.
+    2.  Updating the backend settings API () to manage these new configurations.
+    3.  Overhauling the frontend Admin Page to provide a UI for managing all these new settings.
+    4.  Refactoring all frontend pages (starting with  and ) to fetch and render content dynamically based on the configuration from the backend, instead of using hardcoded data or specific API calls.
+-   **Status:** IN PROGRESS
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** both
+-   **User Testing Done:** N
+
+**All Pending/In progress Issue list**:
+There are no outstanding bugs or issues. The primary focus is on completing the in-progress feature development.
+
+**In progress Task List**:
+-   **Task 1: Complete the Site Customization (Whitelabel) Feature (P0)**
+    -   **Where to resume:** The agent has modified  and . It has also started creating a new  and refactoring . The next step is to continue this refactor across all remaining frontend components and pages (, , , , , etc.) to make them render dynamically based on the data fetched from the  endpoint.
+    -   **What will be achieved with this?** The user will be able to modify the entire site's product, branding, content, and layout from the admin panel, turning the project into a reusable template.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** both
+
+**Upcoming and Future Tasks**
+-   **Task 1: Test Webhook Integration (P1)**
+    -   The backend has a  endpoint to receive payment confirmation, but the end-to-end flow (a payment being marked as 'paid' and the order status updating in the DB) has not been tested. This needs verification to ensure orders are correctly updated after payment.
+
+**Completed work in this session**
+-   Full-stack development of the NeuroVita sales website (React/FastAPI).
+-   Mobile-first responsive design implementation.
+-   Integration with ViaCEP for real-time shipping calculation.
+-   Implementation of scarcity features (countdown timer, stock counter).
+-   Full integration with OrionPay API for PIX payment generation and a dedicated payment page.
+-   Creation of a basic admin panel to view orders.
+-   Dynamic product options and pricing logic on the sales page.
+-   Automated backend testing suite created and passed.
+-   Manual end-to-end testing of the complete user flow.
+
+**Earlier issues found/mentioned but not fixed**
+-   **Issue 1:  Recursion**
+    -   **Description:** During initial development, using  on data arrays in React components (, ) caused an infinite recursion error with , leading to a blank page.
+    -   **Fix Applied:** The agent worked around this by removing the dynamic  loops and hardcoding the JSX elements.
+    -   **Why it's not fixed:** This is a workaround, not a root cause fix. The underlying issue with the Babel plugin might resurface if similar dynamic rendering patterns are used. However, with the current major refactor to pull all content from a backend API, this specific issue is unlikely to recur in the same files. It remains a piece of technical debt to be aware of.
+    -   **Status:** RESOLVED (via workaround)
+
+**Known issue recurrence from previous fork**
+N/A
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+-   **Frontend:** React.js
+-   **Backend:** FastAPI (Python)
+-   **Database:** In-memory Python dictionaries (temporary, resets on restart)
+-   **Styling:** CSS with media queries for responsiveness
+-   **APIs:** RESTful APIs for communication between frontend and backend.
+
+**key DB schema**
+The database is in-memory () and uses Python lists of dictionaries. The structure is defined by Pydantic models in .
+
+-   **settings**: A single dictionary containing site-wide configuration. It's being expanded to include , , , , , and .
+-   **orders**: A list of order objects, with keys like , , , , , , , , etc.
+-   **products**: A list of product option objects, with keys like uid=0(root) gid=0(root) groups=0(root), , , .
+
+**changes in tech stack**
+N/A
+
+**All files of reference**
+-   : Defines the data structure for the entire application. It was recently modified to support the new whitelabel feature.
+-   : API endpoint for managing site configuration. Currently being updated.
+-   : The UI for the new site customization feature. Currently being built.
+-   : The first page being refactored to use the new dynamic settings.
+-   : The core checkout page. Will need a major refactor to support the new settings.
+-   : Contains the logic for interacting with the OrionPay API.
+-   : Displays the PIX QR code to the user.
+
+**Critical Info for New Agent**
+-   The most critical task is completing the pivot to a whitelabel/CMS platform. This is a significant architectural change. The work is in progress, and many frontend pages will be in a broken or inconsistent state until the refactor is complete.
+-   The database is **in-memory**. All data (orders, settings) will be lost if the backend server restarts. This is suitable for development but not for production.
+-   The OrionPay API key is stored in .
+
+**documents and test reports created in this job**
+-   
+-   
+-   
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **User:** no painel de admin deixe a opcao de mudar o produto, imagem, layout do site e tudo, para qualquer nome e logo que desejar, será como um site padrao para que possa ser utilziado para outros produtos - **Status: IN PROGRESS.** This is the current main task.
+2.  **User:** opay_05e18c914e2892682770c2b96dd4823c71597e93bf6da562ca044bfef14524b0 (OrionPay API Key) - **Status: COMPLETED.** Key was integrated.
+3.  **User:** vamos adicionar a api agora, esta é a documentacao https://pay.orion.moe/desenvolvedores - **Status: COMPLETED.** OrionPay integration is done.
+4.  **User:** adicione um tempo esgotando para criar sensacao de escassez na tela do checkout - **Status: COMPLETED.** Countdown timer and urgency bar were added.
+5.  **User:** faca os testes - **Status: COMPLETED.** Agent performed manual end-to-end tests.
+6.  **User:** ótimo, pode prosseguir pro backend - **Status: COMPLETED.** User approval to start backend work.
+7.  **User:** atualize o valor para 197 cada frasco caso cliente selecione 1 frasco ou 2 frascos nos botoes - **Status: COMPLETED.** Prices were updated.
+8.  **User:** deixe disponivel somente a opcao 2 amostras, as outras vc muda para 2 Amostras + 1 Frasco 60 Capsulas, e o outro 2 amostras + 2 Frascos 60 capsulas - **Status: COMPLETED.** Product options were updated.
+9.  **User:** o site precisa ser responsivo pois o foco é acesso via celular - **Status: COMPLETED.** Site was made responsive.
+
+**Project Health Check:**
+-   **Functional:** Core application flow (checkout, payment generation) is working.
+-   **Broken:** The  and  are currently in a partially refactored state due to the ongoing work on the whitelabel feature. Other pages that haven't been refactored might also break as they still rely on the old data structure.
+
+**3rd Party Integrations**
+-   **ViaCEP** (Shipping Calculation) — Public API, no key required.
+-   **OrionPay** (Payments) — Requires User API Key.
+
+**Testing status**
+-   **Testing agent used after significant changes:** YES (Backend testing agent was used after backend creation).
+-   **Troubleshoot agent used after agent stuck in loop:** NO
+-   **Test files created:** 
+-   **Known regressions:** None, but the ongoing refactor has likely introduced temporary breakages.
+
+**Credentials to test flow:**
+-   **OrionPay API Key**:  (stored in )
+
+**What agent forgot to execute**
+The agent has successfully addressed all user requests chronologically. No tasks or requirements have been missed.</analysis>
