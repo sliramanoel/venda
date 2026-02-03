@@ -79,6 +79,7 @@ app.include_router(images.router)
 app.include_router(orders.router)
 app.include_router(payments.router)
 app.include_router(webhooks.router)
+app.include_router(uploads.router)
 
 app.add_middleware(
     CORSMiddleware,
