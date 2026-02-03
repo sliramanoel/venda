@@ -48,6 +48,70 @@ check_root() {
     fi
 }
 
+# Corrigir problema do apt_pkg (comum em Ubuntu 22.04/24.04)
+fix_apt_pkg() {
+    print_header "Verificando apt_pkg"
+    
+    # Testar se apt_pkg funciona
+    if python3 -c "import apt_pkg" 2>/dev/null; then
+        print_success "apt_pkg está funcionando corretamente"
+        return 0
+    fi
+    
+    print_warning "apt_pkg com problema, corrigindo..."
+    
+    cd /usr/lib/python3/dist-packages
+    
+    # Detectar arquitetura
+    ARCH=$(dpkg --print-architecture)
+    if [ "$ARCH" = "amd64" ]; then
+        ARCH_NAME="x86_64-linux-gnu"
+    else
+        ARCH_NAME="aarch64-linux-gnu"
+    fi
+    
+    # Detectar versão do Python
+    PY_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}{sys.version_info.minor}')")
+    
+    # Nome do arquivo esperado
+    APT_PKG_FILE="apt_pkg.cpython-${PY_VERSION}-${ARCH_NAME}.so"
+    
+    # Verificar se o arquivo existe
+    if [ -f "$APT_PKG_FILE" ]; then
+        # Remover symlink antigo/incorreto
+        rm -f apt_pkg.so
+        
+        # Criar symlink correto
+        ln -s "$APT_PKG_FILE" apt_pkg.so
+        
+        print_success "Symlink criado: apt_pkg.so -> $APT_PKG_FILE"
+    else
+        # Tentar encontrar qualquer arquivo apt_pkg
+        APT_PKG_FOUND=$(ls apt_pkg.cpython-*-${ARCH_NAME}.so 2>/dev/null | head -1)
+        
+        if [ -n "$APT_PKG_FOUND" ]; then
+            rm -f apt_pkg.so
+            ln -s "$APT_PKG_FOUND" apt_pkg.so
+            print_success "Symlink criado: apt_pkg.so -> $APT_PKG_FOUND"
+        else
+            print_error "Arquivo apt_pkg não encontrado, tentando reinstalar..."
+            apt download python3-apt 2>/dev/null || true
+            dpkg --force-all -i python3-apt*.deb 2>/dev/null || true
+            rm -f python3-apt*.deb 2>/dev/null || true
+        fi
+    fi
+    
+    # Testar novamente
+    if python3 -c "import apt_pkg" 2>/dev/null; then
+        print_success "apt_pkg corrigido com sucesso!"
+    else
+        print_warning "Não foi possível corrigir apt_pkg, desabilitando script problemático..."
+        chmod -x /usr/lib/cnf-update-db 2>/dev/null || true
+    fi
+    
+    cd - > /dev/null
+}
+
 # Coletar informações do usuário
 collect_info() {
     print_header "Configuração Inicial"
