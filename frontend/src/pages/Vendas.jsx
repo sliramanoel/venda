@@ -156,6 +156,28 @@ const Vendas = () => {
     return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
   };
 
+  // Debounced field validation
+  const validateField = async (fieldName, value) => {
+    if (!value || value.trim() === '') {
+      setFieldErrors(prev => ({ ...prev, [fieldName]: null }));
+      return;
+    }
+
+    setValidatingField(fieldName);
+    try {
+      const result = await ordersApi.validate({ [fieldName]: value });
+      if (result.errors && result.errors[fieldName]) {
+        setFieldErrors(prev => ({ ...prev, [fieldName]: result.errors[fieldName] }));
+      } else {
+        setFieldErrors(prev => ({ ...prev, [fieldName]: null }));
+      }
+    } catch (error) {
+      console.error('Validation error:', error);
+    } finally {
+      setValidatingField(null);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
@@ -169,6 +191,19 @@ const Vendas = () => {
       setFormData(prev => ({ ...prev, [name]: formatted }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
+    }
+    
+    // Clear error when user types
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({ ...prev, [name]: null }));
+    }
+  };
+
+  // Validate on blur
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    if (['name', 'email', 'phone'].includes(name)) {
+      validateField(name, value);
     }
   };
 
