@@ -719,6 +719,133 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
+          {/* PAGAMENTOS */}
+          <TabsContent value="payments">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2"><CreditCard className="w-5 h-5 text-emerald-600" /> Gateway de Pagamento</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                {/* OrionPay Configuration */}
+                <div className="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center">
+                      <CreditCard className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-slate-900">OrionPay</h4>
+                      <p className="text-xs text-slate-600">Gateway de pagamento PIX</p>
+                    </div>
+                    <div className="ml-auto">
+                      {settings?.orionpayApiKey ? (
+                        <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">
+                          Configurado
+                        </span>
+                      ) : (
+                        <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+                          Não configurado
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label>API Key</Label>
+                      <Input 
+                        type="password"
+                        value={settings?.orionpayApiKey || ''} 
+                        onChange={e => handleSettingsChange('orionpayApiKey', e.target.value)} 
+                        placeholder="opay_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                        className="mt-1.5 bg-white font-mono text-sm" 
+                      />
+                      <p className="text-xs text-slate-500 mt-1">
+                        Encontre em: <a href="https://pay.orion.moe/desenvolvedores" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">pay.orion.moe/desenvolvedores</a>
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label>Webhook Secret (opcional)</Label>
+                      <Input 
+                        type="password"
+                        value={settings?.orionpayWebhookSecret || ''} 
+                        onChange={e => handleSettingsChange('orionpayWebhookSecret', e.target.value)} 
+                        placeholder="whsec_xxxxxxxxxxxxxxxx"
+                        className="mt-1.5 bg-white font-mono text-sm" 
+                      />
+                      <p className="text-xs text-slate-500 mt-1">
+                        Para validar notificações de pagamento
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payment Settings */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-slate-900">Configurações de Pagamento</h4>
+                  
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Tempo de Expiração do PIX (minutos)</Label>
+                      <Input 
+                        type="number"
+                        min="5"
+                        max="120"
+                        value={settings?.pixExpirationMinutes || 30} 
+                        onChange={e => handleSettingsChange('pixExpirationMinutes', parseInt(e.target.value) || 30)} 
+                        className="mt-1.5" 
+                      />
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                      <div>
+                        <Label>Modo de Teste</Label>
+                        <p className="text-xs text-slate-500">Pagamentos em ambiente de teste</p>
+                      </div>
+                      <Switch 
+                        checked={settings?.paymentTestMode ?? true}
+                        onCheckedChange={(checked) => handleSettingsChange('paymentTestMode', checked)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Webhook URL */}
+                <div className="p-4 bg-slate-100 rounded-xl">
+                  <h4 className="font-semibold text-slate-900 mb-2">URL do Webhook</h4>
+                  <p className="text-xs text-slate-600 mb-2">Configure esta URL no painel do OrionPay para receber notificações de pagamento:</p>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 p-2 bg-white rounded border text-xs font-mono text-slate-700 break-all">
+                      {window.location.origin}/api/webhooks/orionpay
+                    </code>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/api/webhooks/orionpay`);
+                        toast.success('URL copiada!');
+                      }}
+                    >
+                      Copiar
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Payment Status Card */}
+                <div className={`p-4 rounded-xl border-2 ${settings?.orionpayApiKey ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
+                  <h4 className={`font-semibold mb-2 ${settings?.orionpayApiKey ? 'text-emerald-800' : 'text-amber-800'}`}>
+                    Status da Integração
+                  </h4>
+                  <ul className={`text-sm space-y-1 ${settings?.orionpayApiKey ? 'text-emerald-700' : 'text-amber-700'}`}>
+                    <li>{settings?.orionpayApiKey ? '✓' : '○'} API Key configurada</li>
+                    <li>{settings?.orionpayApiKey ? '✓' : '○'} Geração de PIX habilitada</li>
+                    <li>✓ Webhook configurado para receber pagamentos</li>
+                    <li>✓ Atualização automática de status do pedido</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* PEDIDOS */}
           <TabsContent value="orders">
             <Card className="border-0 shadow-lg">
