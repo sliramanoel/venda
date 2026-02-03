@@ -185,6 +185,9 @@ const Admin = () => {
             <TabsTrigger value="brand" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs">
               <Type className="w-4 h-4 mr-1" /> Marca
             </TabsTrigger>
+            <TabsTrigger value="theme" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs">
+              <Paintbrush className="w-4 h-4 mr-1" /> Tema
+            </TabsTrigger>
             <TabsTrigger value="product" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs">
               <Package className="w-4 h-4 mr-1" /> Produto
             </TabsTrigger>
