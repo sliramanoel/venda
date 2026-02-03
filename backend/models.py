@@ -121,6 +121,20 @@ class SettingsBase(BaseModel):
         "Compromisso com resultados",
         "Atendimento humanizado"
     ]
+    
+    # SEO & Meta Ads
+    metaPixelId: str = ""  # Facebook/Meta Pixel ID
+    googleAnalyticsId: str = ""  # Google Analytics ID (optional)
+    
+    # Open Graph / Social Sharing
+    ogTitle: str = ""  # Falls back to siteName + tagline if empty
+    ogDescription: str = ""  # Falls back to description if empty
+    ogImage: str = ""  # Image URL for social sharing
+    
+    # SEO
+    metaTitle: str = ""  # <title> tag - falls back to siteName if empty
+    metaDescription: str = ""  # Meta description - falls back to description if empty
+    metaKeywords: str = "suplemento natural, memória, concentração, disposição, energia"
 
 class SettingsUpdate(BaseModel):
     siteName: Optional[str] = None
