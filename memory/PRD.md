@@ -168,6 +168,14 @@ REACT_APP_BACKEND_URL=https://neurovita-sales.preview.emergentagent.com
     - Real-time validation on blur
     - Name validation (first + last name required)
     - Fake pattern detection (repeated digits, sequential numbers)
+15. ✅ **Meta Ads Optimization** - Dec 2025
+    - Meta Pixel (Facebook Pixel) integration with configurable ID
+    - Conversion events tracking (PageView, ViewContent, AddToCart, InitiateCheckout, AddPaymentInfo, Purchase)
+    - UTM parameter tracking (utm_source, utm_medium, utm_campaign, utm_term, utm_content, fbclid)
+    - Open Graph meta tags for social sharing
+    - SEO meta tags (title, description, keywords)
+    - Admin panel tab for Meta Ads configuration
+    - Dynamic meta tags based on page content
 
 ## Backlog / Future Enhancements
 
