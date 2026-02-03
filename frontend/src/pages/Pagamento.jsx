@@ -90,14 +90,18 @@ const Pagamento = () => {
       const status = await paymentsApi.checkStatus(orderId);
       if (status.isPaid) {
         setPaymentStatus('paid');
-        toast.success('Pagamento confirmado!');
+        toast.success('Pagamento confirmado! Redirecionando...');
+        // Redirect to success page after 2 seconds
+        setTimeout(() => {
+          navigate(`/sucesso/${orderId}`);
+        }, 2000);
       }
       return status.isPaid;
     } catch (error) {
       console.error('Error checking status:', error);
       return false;
     }
-  }, [orderId]);
+  }, [orderId, navigate]);
 
   useEffect(() => {
     if (paymentStatus === 'paid' || !pixData) return;
