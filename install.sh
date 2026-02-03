@@ -2,7 +2,8 @@
 
 #===============================================================================
 # NeuroVita - Script de Instalação para VPS
-# Compatível com: Ubuntu 20.04/22.04, Debian 11/12
+# Compatível com: Ubuntu 20.04/22.04/24.04, Debian 11/12
+# Versão: 2.0 - Corrigido com base em instalação real
 #===============================================================================
 
 set -e
@@ -48,9 +49,11 @@ check_root() {
     fi
 }
 
-# Corrigir problema do apt_pkg (comum em Ubuntu 22.04/24.04)
+# ============================================================================
+# CORREÇÃO 1: Corrigir apt_pkg (problema comum em Ubuntu 22.04/24.04)
+# ============================================================================
 fix_apt_pkg() {
-    print_header "Verificando apt_pkg"
+    print_header "Verificando e corrigindo apt_pkg"
     
     # Testar se apt_pkg funciona
     if python3 -c "import apt_pkg" 2>/dev/null; then
@@ -76,25 +79,22 @@ fix_apt_pkg() {
     # Nome do arquivo esperado
     APT_PKG_FILE="apt_pkg.cpython-${PY_VERSION}-${ARCH_NAME}.so"
     
-    # Verificar se o arquivo existe
+    # Remover symlink antigo/incorreto
+    rm -f apt_pkg.so
+    
+    # Verificar se o arquivo existe e criar symlink
     if [ -f "$APT_PKG_FILE" ]; then
-        # Remover symlink antigo/incorreto
-        rm -f apt_pkg.so
-        
-        # Criar symlink correto
         ln -s "$APT_PKG_FILE" apt_pkg.so
-        
         print_success "Symlink criado: apt_pkg.so -> $APT_PKG_FILE"
     else
         # Tentar encontrar qualquer arquivo apt_pkg
         APT_PKG_FOUND=$(ls apt_pkg.cpython-*-${ARCH_NAME}.so 2>/dev/null | head -1)
         
         if [ -n "$APT_PKG_FOUND" ]; then
-            rm -f apt_pkg.so
             ln -s "$APT_PKG_FOUND" apt_pkg.so
             print_success "Symlink criado: apt_pkg.so -> $APT_PKG_FOUND"
         else
-            print_error "Arquivo apt_pkg não encontrado, tentando reinstalar..."
+            print_warning "Arquivo apt_pkg não encontrado, tentando reinstalar..."
             apt download python3-apt 2>/dev/null || true
             dpkg --force-all -i python3-apt*.deb 2>/dev/null || true
             rm -f python3-apt*.deb 2>/dev/null || true
@@ -165,7 +165,7 @@ install_python() {
     print_header "Instalando Python 3.11"
     
     # Adicionar repositório deadsnakes para Python 3.11
-    add-apt-repository -y ppa:deadsnakes/ppa
+    add-apt-repository -y ppa:deadsnakes/ppa 2>/dev/null || true
     apt update
     
     apt install -y python3.11 python3.11-venv python3.11-dev python3-pip
@@ -182,10 +182,17 @@ install_mongodb() {
     
     # Importar chave GPG
     curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
-        gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+        gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor --yes
     
-    # Adicionar repositório
-    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | \
+    # Detectar versão do Ubuntu
+    UBUNTU_CODENAME=$(lsb_release -cs)
+    
+    # Adicionar repositório (usar jammy para versões mais novas)
+    if [[ "$UBUNTU_CODENAME" == "noble" ]]; then
+        UBUNTU_CODENAME="jammy"
+    fi
+    
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu ${UBUNTU_CODENAME}/mongodb-org/7.0 multiverse" | \
         tee /etc/apt/sources.list.d/mongodb-org-7.0.list
     
     apt update
@@ -209,11 +216,33 @@ install_nginx() {
     print_success "Nginx instalado"
 }
 
-# Instalar Certbot para SSL
+# ============================================================================
+# CORREÇÃO 5: Instalar Certbot via Snap (evita problemas de Python)
+# ============================================================================
 install_certbot() {
     print_header "Instalando Certbot (Let's Encrypt)"
     
-    apt install -y certbot python3-certbot-nginx
+    # Instalar snapd
+    apt install -y snapd
+    systemctl enable snapd
+    systemctl start snapd
+    
+    # Aguardar snapd iniciar
+    sleep 5
+    
+    # Instalar certbot via snap
+    snap install core 2>/dev/null || true
+    snap refresh core 2>/dev/null || true
+    snap install --classic certbot 2>/dev/null || true
+    
+    # Criar link simbólico
+    ln -sf /snap/bin/certbot /usr/bin/certbot
+    
+    # Se snap falhar, tentar via pip
+    if ! command -v certbot &> /dev/null; then
+        print_warning "Snap falhou, instalando via pip..."
+        pip3 install certbot certbot-nginx
+    fi
     
     print_success "Certbot instalado"
 }
@@ -241,18 +270,15 @@ copy_project_files() {
     # Copiar backend
     cp -r $SCRIPT_DIR/backend/* $APP_DIR/backend/
     
-    # Copiar frontend (apenas arquivos de build)
-    if [ -d "$SCRIPT_DIR/frontend/build" ]; then
-        cp -r $SCRIPT_DIR/frontend/build/* $APP_DIR/frontend/
-    else
-        # Se não tiver build, copiar tudo e fazer build depois
-        cp -r $SCRIPT_DIR/frontend/* $APP_DIR/frontend/
-    fi
+    # Copiar frontend
+    cp -r $SCRIPT_DIR/frontend/* $APP_DIR/frontend/
     
     print_success "Arquivos copiados"
 }
 
-# Configurar ambiente do Backend
+# ============================================================================
+# CORREÇÃO 2 e 3: Requirements.txt simplificado (sem emergentintegrations)
+# ============================================================================
 setup_backend() {
     print_header "Configurando Backend"
     
@@ -261,6 +287,24 @@ setup_backend() {
     # Criar ambiente virtual
     python3 -m venv venv
     source venv/bin/activate
+    
+    # Criar requirements.txt simplificado (evita conflitos)
+    cat > requirements.txt << 'REQEOF'
+fastapi>=0.100.0
+uvicorn>=0.23.0
+motor>=3.3.0
+pymongo>=4.5.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.6
+httpx>=0.24.0
+requests>=2.31.0
+qrcode[pil]>=7.4
+email-validator>=2.0.0
+bcrypt==4.0.1
+REQEOF
     
     # Instalar dependências
     pip install --upgrade pip setuptools wheel
@@ -280,31 +324,32 @@ EOF
     print_success "Backend configurado"
 }
 
-# Configurar ambiente do Frontend
+# ============================================================================
+# CORREÇÃO 7: Frontend com URL correta e rebuild
+# ============================================================================
 setup_frontend() {
     print_header "Configurando Frontend"
     
     cd $APP_DIR/frontend
     
-    # Criar arquivo .env
+    # Criar arquivo .env com URL correta
     cat > .env << EOF
 REACT_APP_BACKEND_URL=https://${DOMAIN}
 EOF
     
-    # Se não tiver build, fazer build
-    if [ ! -f "index.html" ]; then
-        yarn install
-        yarn build
-        
-        # Mover arquivos de build para a raiz
-        mv build/* .
-        rm -rf build
-    fi
+    # Instalar dependências e fazer build
+    yarn install
+    yarn build
     
-    print_success "Frontend configurado"
+    # Copiar arquivos de build para a raiz do frontend
+    cp -r build/* .
+    
+    print_success "Frontend configurado e compilado"
 }
 
-# Criar serviço systemd para o Backend
+# ============================================================================
+# CORREÇÃO 6: Backend roda como ROOT (bcrypt não funciona com www-data)
+# ============================================================================
 create_backend_service() {
     print_header "Criando Serviço do Backend"
     
@@ -315,8 +360,8 @@ After=network.target mongod.service
 
 [Service]
 Type=simple
-User=www-data
-Group=www-data
+User=root
+Group=root
 WorkingDirectory=${APP_DIR}/backend
 Environment="PATH=${APP_DIR}/backend/venv/bin"
 ExecStart=${APP_DIR}/backend/venv/bin/uvicorn server:app --host 0.0.0.0 --port ${BACKEND_PORT}
@@ -334,7 +379,9 @@ EOF
     print_success "Serviço do backend criado e iniciado"
 }
 
-# Configurar Nginx
+# ============================================================================
+# CORREÇÃO 4: Nginx SEM SSL inicialmente (Certbot adiciona depois)
+# ============================================================================
 configure_nginx() {
     print_header "Configurando Nginx"
     
@@ -379,7 +426,7 @@ server {
     
     # Uploads
     location /uploads/ {
-        alias ${APP_DIR}/uploads/;
+        alias ${APP_DIR}/backend/uploads/;
         expires 1y;
         add_header Cache-Control "public";
     }
@@ -410,11 +457,79 @@ EOF
 setup_ssl() {
     print_header "Configurando SSL (Let's Encrypt)"
     
-    certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} --non-interactive --agree-tos -m ${SSL_EMAIL}
+    # Tentar via certbot nginx plugin
+    if certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} --non-interactive --agree-tos -m ${SSL_EMAIL} 2>/dev/null; then
+        print_success "SSL configurado via plugin nginx"
+    else
+        # Se falhar, usar modo standalone
+        print_warning "Plugin nginx falhou, usando modo standalone..."
+        systemctl stop nginx
+        certbot certonly --standalone -d ${DOMAIN} -d www.${DOMAIN} --non-interactive --agree-tos -m ${SSL_EMAIL}
+        
+        # Atualizar config do Nginx com SSL manual
+        cat > /etc/nginx/sites-available/${APP_NAME} << EOF
+server {
+    listen 80;
+    server_name ${DOMAIN} www.${DOMAIN};
+    return 301 https://\$server_name\$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name ${DOMAIN} www.${DOMAIN};
+    
+    # SSL
+    ssl_certificate /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    
+    # Logs
+    access_log ${APP_DIR}/logs/nginx_access.log;
+    error_log ${APP_DIR}/logs/nginx_error.log;
+    
+    # Frontend
+    root ${APP_DIR}/frontend;
+    index index.html;
+    
+    # Gzip
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
+    
+    # Cache
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    # API Backend
+    location /api/ {
+        proxy_pass http://127.0.0.1:${BACKEND_PORT};
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+    
+    # Uploads
+    location /uploads/ {
+        alias ${APP_DIR}/backend/uploads/;
+    }
+    
+    # SPA fallback
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+}
+EOF
+        
+        systemctl start nginx
+    fi
     
     # Configurar renovação automática
-    systemctl enable certbot.timer
-    systemctl start certbot.timer
+    systemctl enable certbot.timer 2>/dev/null || true
+    systemctl start certbot.timer 2>/dev/null || true
     
     print_success "SSL configurado"
 }
@@ -439,9 +554,12 @@ setup_firewall() {
 set_permissions() {
     print_header "Ajustando Permissões"
     
-    chown -R www-data:www-data $APP_DIR
+    # Permissões gerais
     chmod -R 755 $APP_DIR
     chmod 600 $APP_DIR/backend/.env
+    
+    # Permissões de uploads (precisa ser gravável)
+    chmod -R 777 $APP_DIR/backend/uploads
     
     print_success "Permissões ajustadas"
 }
@@ -456,10 +574,48 @@ create_admin_user() {
     # Esperar o backend iniciar
     sleep 5
     
-    # Criar usuário via API
-    curl -s -X POST "http://localhost:${BACKEND_PORT}/api/auth/register" \
-        -H "Content-Type: application/json" \
-        -d "{\"name\":\"Admin\",\"email\":\"admin@${DOMAIN}\",\"password\":\"${ADMIN_PASSWORD}\"}" > /dev/null 2>&1 || true
+    # Criar usuário via Python (mais confiável que curl)
+    cd $APP_DIR/backend
+    source venv/bin/activate
+    
+    python3 << PYEOF
+import asyncio
+from motor.motor_asyncio import AsyncIOMotorClient
+from passlib.context import CryptContext
+from datetime import datetime, timezone
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+async def create_admin():
+    client = AsyncIOMotorClient("mongodb://localhost:27017")
+    db = client["${APP_NAME}_db"]
+    
+    # Verificar se já existe
+    existing = await db.users.find_one({"email": "admin@${DOMAIN}"})
+    if existing:
+        print("Usuário admin já existe")
+        return
+    
+    # Criar hash da senha
+    hashed = pwd_context.hash("${ADMIN_PASSWORD}")
+    
+    # Criar usuário
+    user = {
+        "name": "Admin",
+        "email": "admin@${DOMAIN}",
+        "password": hashed,
+        "createdAt": datetime.now(timezone.utc)
+    }
+    
+    await db.users.insert_one(user)
+    print("Usuário admin criado com sucesso!")
+    
+    client.close()
+
+asyncio.run(create_admin())
+PYEOF
+    
+    deactivate
     
     echo ""
     print_success "Usuário admin criado:"
@@ -477,16 +633,16 @@ show_summary() {
     echo -e "${GREEN}║${NC}  NeuroVita instalado com sucesso!                          ${GREEN}║${NC}"
     echo -e "${GREEN}╠════════════════════════════════════════════════════════════╣${NC}"
     echo -e "${GREEN}║${NC}                                                            ${GREEN}║${NC}"
-    echo -e "${GREEN}║${NC}  🌐 Site: https://${DOMAIN}                    ${GREEN}║${NC}"
-    echo -e "${GREEN}║${NC}  🔧 Admin: https://${DOMAIN}/admin             ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  🌐 Site: https://${DOMAIN}                                ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  🔧 Admin: https://${DOMAIN}/admin                         ${GREEN}║${NC}"
     echo -e "${GREEN}║${NC}                                                            ${GREEN}║${NC}"
-    echo -e "${GREEN}║${NC}  📁 Diretório: ${APP_DIR}                      ${GREEN}║${NC}"
-    echo -e "${GREEN}║${NC}  📋 Logs: ${APP_DIR}/logs                      ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  📁 Diretório: ${APP_DIR}                                  ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  📋 Logs: ${APP_DIR}/logs                                  ${GREEN}║${NC}"
     echo -e "${GREEN}║${NC}                                                            ${GREEN}║${NC}"
     echo -e "${GREEN}║${NC}  Comandos úteis:                                           ${GREEN}║${NC}"
-    echo -e "${GREEN}║${NC}  - Status: systemctl status ${APP_NAME}-backend ${GREEN}║${NC}"
-    echo -e "${GREEN}║${NC}  - Logs: journalctl -u ${APP_NAME}-backend -f   ${GREEN}║${NC}"
-    echo -e "${GREEN}║${NC}  - Reiniciar: systemctl restart ${APP_NAME}-backend ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  - Status: systemctl status ${APP_NAME}-backend            ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  - Logs: journalctl -u ${APP_NAME}-backend -f              ${GREEN}║${NC}"
+    echo -e "${GREEN}║${NC}  - Reiniciar: systemctl restart ${APP_NAME}-backend        ${GREEN}║${NC}"
     echo -e "${GREEN}║${NC}                                                            ${GREEN}║${NC}"
     echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
 }
@@ -501,8 +657,8 @@ main() {
     echo " | |\  ||  __/| |_| || |     \ V /  | || |_ | (_| |"
     echo " |_| \_| \___| \__,_||_|      \_/   |_| \__| \__,_|"
     echo -e "${NC}"
-    echo "  Instalador Automático para VPS"
-    echo "  ================================"
+    echo "  Instalador Automático para VPS v2.0"
+    echo "  ===================================="
     echo ""
     
     check_root
