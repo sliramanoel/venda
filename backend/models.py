@@ -191,6 +191,12 @@ class SettingsUpdate(BaseModel):
     orionpayWebhookSecret: Optional[str] = None
     paymentTestMode: Optional[bool] = None
     pixExpirationMinutes: Optional[int] = None
+    # Theme / Colors
+    primaryColor: Optional[str] = None
+    primaryColorLight: Optional[str] = None
+    primaryColorDark: Optional[str] = None
+    secondaryColor: Optional[str] = None
+    accentColor: Optional[str] = None
 
 class SettingsResponse(SettingsBase):
     id: str = Field(alias="_id")
