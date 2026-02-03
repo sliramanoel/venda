@@ -1,11 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Target, Eye, Heart, Award, Users, Leaf, ArrowRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { aboutData, productImages } from '../data/mock';
+import { imagesApi } from '../services/api';
+
+const aboutData = {
+  mission: "Nossa missão é proporcionar saúde e bem-estar através de suplementos naturais de alta qualidade, ajudando pessoas a alcançarem seu potencial máximo de memória e disposição.",
+  vision: "Ser referência nacional em suplementação natural para saúde cognitiva, reconhecida pela qualidade e eficácia de nossos produtos.",
+  history: "A NeuroVita nasceu da busca por soluções naturais para melhorar a qualidade de vida. Fundada por especialistas em nutrição e fitoterapia, nossa empresa se dedica a desenvolver fórmulas que combinam o melhor da natureza com a ciência moderna."
+};
 
 const QuemSomos = () => {
+  const [productImages, setProductImages] = useState({ secondary: '' });
+
+  useEffect(() => {
+    const loadImages = async () => {
+      try {
+        const images = await imagesApi.get();
+        setProductImages(images);
+      } catch (error) {
+        console.error('Error loading images:', error);
+      }
+    };
+    loadImages();
+  }, []);
+
   return (
     <div className="min-h-screen pt-20">
       <section className="py-16 md:py-24 bg-slate-50 relative overflow-hidden">
