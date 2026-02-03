@@ -244,10 +244,10 @@ class NeuroVitaAPITest:
             
             if response:
                 data = response.json()
-                if data.get('id') == self.created_order_id:
-                    log_success(f"Order retrieved by ID successfully: {data['id']}")
+                if data.get('_id') == self.created_order_id:  # Backend returns _id
+                    log_success(f"Order retrieved by ID successfully: {data['_id']}")
                 else:
-                    log_error(f"Order ID mismatch. Expected: {self.created_order_id}, Got: {data.get('id')}")
+                    log_error(f"Order ID mismatch. Expected: {self.created_order_id}, Got: {data.get('_id')}")
         
         # Test PATCH /api/orders/{id}/status - Update order status
         if self.created_order_id:
