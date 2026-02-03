@@ -341,17 +341,38 @@ const Admin = () => {
                 <CardTitle className="flex items-center gap-2"><Image className="w-5 h-5 text-emerald-600" /> Imagens do Produto</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {['main', 'secondary', 'tertiary'].map((key, idx) => (
-                  <div key={key} className="grid md:grid-cols-2 gap-4 items-start">
-                    <div>
-                      <Label>Imagem {idx === 0 ? 'Principal' : idx === 1 ? 'Secundária' : 'Terciária'}</Label>
-                      <Input value={images?.[key] || ''} onChange={e => handleImageChange(key, e.target.value)} placeholder="URL da imagem" className="mt-1.5" />
-                    </div>
-                    <div className="bg-slate-100 rounded-xl p-3">
-                      <img src={images?.[key] || ''} alt={`Preview ${key}`} className="w-full h-32 object-cover rounded-lg" onError={e => e.target.src = 'https://via.placeholder.com/400x300?text=Sem+Imagem'} />
-                    </div>
+                <div className="grid md:grid-cols-3 gap-6">
+                  <ImageUploader
+                    label="Imagem Principal"
+                    value={images?.main || ''}
+                    onChange={(url) => handleImageChange('main', url)}
+                  />
+                  <ImageUploader
+                    label="Imagem Secundária"
+                    value={images?.secondary || ''}
+                    onChange={(url) => handleImageChange('secondary', url)}
+                  />
+                  <ImageUploader
+                    label="Imagem Terciária"
+                    value={images?.tertiary || ''}
+                    onChange={(url) => handleImageChange('tertiary', url)}
+                  />
+                </div>
+                <div className="border-t pt-4">
+                  <h4 className="font-semibold mb-4">Logo e Favicon</h4>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <ImageUploader
+                      label="Logo do Site"
+                      value={images?.logo || ''}
+                      onChange={(url) => handleImageChange('logo', url)}
+                    />
+                    <ImageUploader
+                      label="Favicon"
+                      value={images?.favicon || ''}
+                      onChange={(url) => handleImageChange('favicon', url)}
+                    />
                   </div>
-                ))}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
