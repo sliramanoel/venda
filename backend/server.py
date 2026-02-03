@@ -73,6 +73,7 @@ async def get_status_checks():
 app.include_router(api_router)
 
 # Include NeuroVita routers
+app.include_router(auth.router)
 app.include_router(settings.router)
 app.include_router(images.router)
 app.include_router(orders.router)
