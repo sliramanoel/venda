@@ -108,3 +108,31 @@ async def update_order_status(order_id: str, status_update: OrderStatusUpdate):
     updated_order["_id"] = str(updated_order["_id"])
     
     return updated_order
+
+@router.post("/validate")
+async def validate_order_data(data: dict):
+    """Validate order data before submission (real-time validation)"""
+    errors = {}
+    
+    # Validate name if provided
+    if 'name' in data and data['name']:
+        is_valid, error_msg = validate_name(data['name'])
+        if not is_valid:
+            errors['name'] = error_msg
+    
+    # Validate phone if provided
+    if 'phone' in data and data['phone']:
+        is_valid, error_msg = validate_brazilian_phone(data['phone'])
+        if not is_valid:
+            errors['phone'] = error_msg
+    
+    # Validate email if provided
+    if 'email' in data and data['email']:
+        is_valid, error_msg = validate_email(data['email'])
+        if not is_valid:
+            errors['email'] = error_msg
+    
+    return {
+        "valid": len(errors) == 0,
+        "errors": errors
+    }
