@@ -187,7 +187,7 @@ class NeuroVitaAPITest:
         
         if response:
             data = response.json()
-            self.created_order_id = data.get('id')
+            self.created_order_id = data.get('_id')  # Backend returns _id, not id
             order_number = data.get('orderNumber')
             
             log_success(f"Order created successfully with ID: {self.created_order_id}")
