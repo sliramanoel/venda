@@ -114,7 +114,31 @@ export const paymentsApi = {
   checkStatus: async (orderId) => {
     const response = await axios.get(`${API}/payments/pix/status/${orderId}`);
     return response.data;
+  },
+  simulatePayment: async (orderId) => {
+    const response = await apiClient.post(`/webhooks/orionpay/simulate-payment?order_id=${orderId}`);
+    return response.data;
   }
 };
 
-export default { settingsApi, imagesApi, ordersApi, paymentsApi };
+// Uploads API
+export const uploadsApi = {
+  uploadImage: async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await apiClient.post('/uploads/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+  listImages: async () => {
+    const response = await apiClient.get('/uploads/list');
+    return response.data;
+  },
+  deleteImage: async (filename) => {
+    const response = await apiClient.delete(`/uploads/images/${filename}`);
+    return response.data;
+  }
+};
+
+export default { settingsApi, imagesApi, ordersApi, paymentsApi, uploadsApi, authApi };
