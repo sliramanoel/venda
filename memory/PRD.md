@@ -81,6 +81,17 @@ All site content is managed through admin panel:
 - `GET /api/auth/me` - Get current user info
 - `POST /api/auth/verify` - Verify JWT token
 
+### Uploads (NEW)
+- `POST /api/uploads/image` - Upload image file (multipart/form-data)
+- `GET /api/uploads/images/{filename}` - Serve uploaded image
+- `GET /api/uploads/list` - List all uploaded images
+- `DELETE /api/uploads/images/{filename}` - Delete image
+
+### Webhooks
+- `GET /api/webhooks/orionpay/test` - Test webhook endpoint
+- `POST /api/webhooks/orionpay` - Receive OrionPay payment notifications
+- `POST /api/webhooks/orionpay/simulate-payment` - Simulate payment (for testing)
+
 ### Settings
 - `GET /api/settings` - Get site configuration
 - `PUT /api/settings` - Update configuration
