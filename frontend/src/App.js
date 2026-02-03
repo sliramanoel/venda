@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import QuemSomos from "./pages/QuemSomos";
 import FAQ from "./pages/FAQ";
 import Vendas from "./pages/Vendas";
+import Pagamento from "./pages/Pagamento";
 import Admin from "./pages/Admin";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
             <Route path="/quem-somos" element={<QuemSomos />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/comprar" element={<Vendas />} />
+            <Route path="/pagamento/:orderId" element={<Pagamento />} />
             <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
