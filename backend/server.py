@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime, timezone
 
 # Import routers
-from routers import settings, images, orders, payments, webhooks
+from routers import settings, images, orders, payments, webhooks, auth
 
 
 ROOT_DIR = Path(__file__).parent
