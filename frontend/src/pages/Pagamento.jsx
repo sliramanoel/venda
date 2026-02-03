@@ -181,11 +181,18 @@ const Pagamento = () => {
               <p className="text-sm text-slate-500 mb-6">
                 Você receberá um e-mail com os detalhes do envio em breve.
               </p>
-              <Link to="/">
-                <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
-                  Voltar ao início
-                </Button>
-              </Link>
+              <div className="flex flex-col gap-3">
+                <Link to={`/sucesso/${orderId}`}>
+                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
+                    Ver detalhes do pedido
+                  </Button>
+                </Link>
+                <Link to="/">
+                  <Button variant="outline" className="w-full">
+                    Voltar ao início
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </div>
