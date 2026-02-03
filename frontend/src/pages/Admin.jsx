@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Save, Image, Settings, RefreshCw, CheckCircle2, Link as LinkIcon, 
   Package, Palette, Type, MessageSquare, Star, HelpCircle, Users,
-  Plus, Trash2, GripVertical, Eye, Upload
+  Plus, Trash2, GripVertical, Eye, Upload, LogOut, User
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -12,19 +13,40 @@ import { Textarea } from '../components/ui/textarea';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Switch } from '../components/ui/switch';
-import { settingsApi, imagesApi, ordersApi } from '../services/api';
+import { settingsApi, imagesApi, ordersApi, authApi } from '../services/api';
 
 const Admin = () => {
+  const navigate = useNavigate();
   const [settings, setSettings] = useState(null);
   const [images, setImages] = useState(null);
   const [orders, setOrders] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("brand");
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    // Check authentication
+    if (!authApi.isAuthenticated()) {
+      navigate('/login');
+      return;
+    }
+    
+    // Verify token is still valid
+    const verifyAuth = async () => {
+      try {
+        await authApi.verify();
+        setCurrentUser(authApi.getUser());
+        loadData();
+      } catch (error) {
+        console.error('Auth verification failed:', error);
+        authApi.logout();
+        navigate('/login');
+      }
+    };
+    
+    verifyAuth();
+  }, [navigate]);
 
   const loadData = async () => {
     try {
@@ -42,6 +64,12 @@ const Admin = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    authApi.logout();
+    toast.success('Logout realizado com sucesso');
+    navigate('/login');
   };
 
   const handleSettingsChange = (field, value) => {
