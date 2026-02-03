@@ -599,6 +599,27 @@ const Admin = () => {
                         <div className="mt-2 text-sm text-slate-500">
                           {order.address}, {order.number} - {order.neighborhood}, {order.city}/{order.state}
                         </div>
+                        {order.status === 'pending' && (
+                          <div className="mt-3 pt-3 border-t">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={async () => {
+                                try {
+                                  await paymentsApi.simulatePayment(order._id);
+                                  toast.success('Pagamento simulado com sucesso!');
+                                  loadData(); // Reload orders
+                                } catch (error) {
+                                  toast.error('Erro ao simular pagamento');
+                                }
+                              }}
+                              className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                            >
+                              <CreditCard className="w-4 h-4 mr-2" />
+                              Simular Pagamento
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
