@@ -95,6 +95,7 @@ const CountdownTimer = () => {
 };
 
 const Vendas = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
