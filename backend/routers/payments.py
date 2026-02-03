@@ -196,8 +196,8 @@ async def generate_pix_payment(order_id: str):
     # Fallback to test mode if OrionPay fails or test mode is enabled
     if not pix_code:
         is_test_mode = True
-        pix_code = generate_pix_code(str(order["_id"]), order["totalPrice"])
-        qr_code = generate_qr_svg(pix_code)
+        pix_code = generate_pix_emv_code(str(order["_id"]), order["totalPrice"])
+        qr_code = generate_qr_code_base64(pix_code)
         transaction_id = f"TEST_{order['_id']}"
         logger.info(f"Using test mode PIX for order {order.get('orderNumber')}")
     
