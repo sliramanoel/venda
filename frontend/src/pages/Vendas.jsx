@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, Truck, CreditCard, CheckCircle2, AlertCircle, Loader2, ShieldCheck, Clock, Star } from 'lucide-react';
+import { Package, Truck, CreditCard, CheckCircle2, AlertCircle, Loader2, ShieldCheck, Clock, Star, Timer, Flame } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -22,6 +22,75 @@ const regionByState = {
   PB: "nordeste", RN: "nordeste", CE: "nordeste", PI: "nordeste", MA: "nordeste",
   AM: "norte", PA: "norte", AC: "norte", RO: "norte", RR: "norte", AP: "norte", TO: "norte",
   MT: "centroOeste", MS: "centroOeste", GO: "centroOeste", DF: "centroOeste"
+};
+
+// Countdown Timer Component
+const CountdownTimer = () => {
+  const [timeLeft, setTimeLeft] = useState(() => {
+    // Check if there's a saved end time in sessionStorage
+    const savedEndTime = sessionStorage.getItem('neurovita_offer_end');
+    if (savedEndTime) {
+      const remaining = Math.max(0, Math.floor((parseInt(savedEndTime) - Date.now()) / 1000));
+      return remaining;
+    }
+    // Set initial time: 15 minutes
+    const initialTime = 15 * 60;
+    sessionStorage.setItem('neurovita_offer_end', (Date.now() + initialTime * 1000).toString());
+    return initialTime;
+  });
+
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          // Reset timer when it reaches 0
+          const newTime = 15 * 60;
+          sessionStorage.setItem('neurovita_offer_end', (Date.now() + newTime * 1000).toString());
+          return newTime;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+  const isUrgent = timeLeft < 300; // Less than 5 minutes
+
+  return (
+    <div className={`flex items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-xl ${
+      isUrgent ? 'bg-red-50 border-2 border-red-200' : 'bg-amber-50 border-2 border-amber-200'
+    }`}>
+      <div className={`p-2 rounded-lg ${isUrgent ? 'bg-red-100' : 'bg-amber-100'}`}>
+        <Timer className={`w-5 h-5 sm:w-6 sm:h-6 ${isUrgent ? 'text-red-600 animate-pulse' : 'text-amber-600'}`} />
+      </div>
+      <div className="text-center">
+        <p className={`text-xs sm:text-sm font-medium ${isUrgent ? 'text-red-700' : 'text-amber-700'}`}>
+          {isUrgent ? 'ÚLTIMOS MINUTOS!' : 'Oferta expira em:'}
+        </p>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <div className={`px-2 sm:px-3 py-1 rounded-lg font-bold text-lg sm:text-2xl ${
+            isUrgent ? 'bg-red-600 text-white' : 'bg-amber-600 text-white'
+          }`}>
+            {String(minutes).padStart(2, '0')}
+          </div>
+          <span className={`text-lg sm:text-2xl font-bold ${isUrgent ? 'text-red-600' : 'text-amber-600'}`}>:</span>
+          <div className={`px-2 sm:px-3 py-1 rounded-lg font-bold text-lg sm:text-2xl ${
+            isUrgent ? 'bg-red-600 text-white' : 'bg-amber-600 text-white'
+          }`}>
+            {String(seconds).padStart(2, '0')}
+          </div>
+        </div>
+      </div>
+      {isUrgent && (
+        <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 animate-bounce" />
+      )}
+    </div>
+  );
 };
 
 const Vendas = () => {
