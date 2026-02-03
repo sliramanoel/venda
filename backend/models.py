@@ -169,6 +169,21 @@ class SettingsUpdate(BaseModel):
     aboutVision: Optional[str] = None
     aboutHistory: Optional[str] = None
     aboutValues: Optional[List[str]] = None
+    # SEO & Meta Ads
+    metaPixelId: Optional[str] = None
+    googleAnalyticsId: Optional[str] = None
+    ogTitle: Optional[str] = None
+    ogDescription: Optional[str] = None
+    ogImage: Optional[str] = None
+    metaTitle: Optional[str] = None
+    metaDescription: Optional[str] = None
+    metaKeywords: Optional[str] = None
+    # Payment Gateway
+    paymentGateway: Optional[str] = None
+    orionpayApiKey: Optional[str] = None
+    orionpayWebhookSecret: Optional[str] = None
+    paymentTestMode: Optional[bool] = None
+    pixExpirationMinutes: Optional[int] = None
 
 class SettingsResponse(SettingsBase):
     id: str = Field(alias="_id")
