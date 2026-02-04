@@ -1269,7 +1269,7 @@ const Admin = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-slate-500">Em breve: Dashboard de Analytics com métricas de acesso, visitantes e ações.</p>
+                <AnalyticsDashboard />
               </CardContent>
             </Card>
           </TabsContent>
