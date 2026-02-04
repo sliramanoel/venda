@@ -6,7 +6,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { toast } from 'sonner';
-import { settingsApi, imagesApi, ordersApi } from '../services/api';
+import { settingsApi, imagesApi, ordersApi, analyticsApi } from '../services/api';
 import SEOHead from '../components/SEOHead';
 import { 
   trackViewContent, 
@@ -16,7 +16,12 @@ import {
   trackLead,
   getOrderUTMParams 
 } from '../utils/tracking';
-import { trackCTAClick, trackStartCheckout, trackFormStart, trackFormComplete } from '../components/AnalyticsTracker';
+
+// Analytics tracking helpers
+const trackCTAClick = (buttonName) => analyticsApi.trackAction('click_cta', window.location.pathname, { button: buttonName });
+const trackStartCheckout = () => analyticsApi.trackAction('start_checkout', window.location.pathname);
+const trackFormStart = (formName) => analyticsApi.trackAction('form_start', window.location.pathname, { form: formName });
+const trackFormComplete = (formName) => analyticsApi.trackAction('form_complete', window.location.pathname, { form: formName });
 
 const shippingRates = {
   sudeste: { min: 15.90, max: 22.90, days: "3 a 5" },
