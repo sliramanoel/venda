@@ -16,7 +16,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Switch } from '../components/ui/switch';
 import { settingsApi, imagesApi, ordersApi, authApi, uploadsApi, paymentsApi } from '../services/api';
 import ImageUploader from '../components/ImageUploader';
-import AnalyticsDashboard from '../components/AnalyticsDashboard';
+// Analytics will be added later
+// import AnalyticsDashboard from '../components/AnalyticsDashboard';
 
 const Admin = () => {
   const navigate = useNavigate();
