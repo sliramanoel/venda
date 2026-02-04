@@ -15,6 +15,7 @@ import Admin from "./pages/Admin";
 import Login from "./pages/Login";
 import { settingsApi } from "./services/api";
 import { initTracking, trackPageView } from "./utils/tracking";
+import AnalyticsTracker from "./components/AnalyticsTracker";
 
 // Component to track page views on route change
 const PageTracker = () => {
