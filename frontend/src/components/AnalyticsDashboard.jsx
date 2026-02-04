@@ -1,122 +1,35 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Users, Eye, MousePointer, Monitor, Smartphone, Tablet,
-  Globe, TrendingUp, Clock, RefreshCw, Calendar, Filter,
-  Activity, Zap
-} from 'lucide-react';
+import { Users, Eye, Monitor, Smartphone, TrendingUp, Clock, RefreshCw, Calendar, Filter, Activity, Zap } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { analyticsApi } from '../services/api';
 
-// Simple Bar Chart Component
-const SimpleBarChart = ({ data, color = 'emerald' }) => {
-  const max = Math.max(...data.map(d => d.value), 1);
-  return (
-    <div className="space-y-2">
-      {data.map((item, index) => (
-        <div key={index} className="flex items-center gap-3">
-          <div className="w-24 text-xs text-slate-600 truncate" title={item.label}>
-            {item.label}
-          </div>
-          <div className="flex-1 h-6 bg-slate-100 rounded overflow-hidden">
-            <div 
-              className={`h-full rounded transition-all duration-500 ${
-                color === 'blue' ? 'bg-blue-500' : 
-                color === 'purple' ? 'bg-purple-500' : 
-                color === 'amber' ? 'bg-amber-500' : 
-                color === 'rose' ? 'bg-rose-500' : 'bg-emerald-500'
-              }`}
-              style={{ width: `${(item.value / max) * 100}%` }}
-            />
-          </div>
-          <div className="w-16 text-right text-sm font-medium text-slate-700">
-            {item.value.toLocaleString('pt-BR')}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-// Timeline Chart Component
-const TimelineChart = ({ data }) => {
-  if (!data || data.length === 0) return <p className="text-slate-500 text-sm">Sem dados</p>;
-  
-  const maxValue = Math.max(...data.map(d => d.pageviews || 0), 1);
-  const chartHeight = 150;
-  
-  return (
-    <div className="relative">
-      <div className="flex items-end justify-between gap-1" style={{ height: chartHeight }}>
-        {data.map((item, index) => {
-          const height = ((item.pageviews || 0) / maxValue) * chartHeight;
-          return (
-            <div key={index} className="flex-1 flex flex-col items-center group">
-              <div className="relative w-full">
-                <div 
-                  className="w-full bg-emerald-500 rounded-t hover:bg-emerald-600 transition-colors cursor-pointer"
-                  style={{ height: Math.max(height, 2) }}
-                />
-                <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">
-                  {item.pageviews} views
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <div className="flex justify-between mt-2 text-xs text-slate-500">
-        {data.length > 0 && (
-          <>
-            <span>{data[0]?.date?.split(' ')[0]}</span>
-            <span>{data[data.length - 1]?.date?.split(' ')[0]}</span>
-          </>
-        )}
-      </div>
-    </div>
-  );
-};
-
 const AnalyticsDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('7d');
-  const [customDates, setCustomDates] = useState({ start: '', end: '' });
   const [overview, setOverview] = useState(null);
   const [pageviews, setPageviews] = useState([]);
-  const [timeline, setTimeline] = useState([]);
   const [devices, setDevices] = useState(null);
-  const [trafficSources, setTrafficSources] = useState(null);
   const [realtime, setRealtime] = useState(null);
-  const [actions, setActions] = useState([]);
   const [activeView, setActiveView] = useState('overview');
 
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const startDate = period === 'custom' ? customDates.start : null;
-      const endDate = period === 'custom' ? customDates.end : null;
-      
-      const [overviewData, pageviewsData, timelineData, devicesData, sourcesData, actionsData] = await Promise.all([
-        analyticsApi.getOverview(period, startDate, endDate),
-        analyticsApi.getPageviews(period, startDate, endDate),
-        analyticsApi.getTimeline(period, 'day', startDate, endDate),
-        analyticsApi.getDevices(period, startDate, endDate),
-        analyticsApi.getTrafficSources(period, startDate, endDate),
-        analyticsApi.getActions(period, startDate, endDate)
+      const [overviewData, pageviewsData, devicesData] = await Promise.all([
+        analyticsApi.getOverview(period),
+        analyticsApi.getPageviews(period),
+        analyticsApi.getDevices(period)
       ]);
-      
       setOverview(overviewData);
       setPageviews(pageviewsData.pages || []);
-      setTimeline(timelineData.timeline || []);
       setDevices(devicesData);
-      setTrafficSources(sourcesData);
-      setActions(actionsData.actions || []);
     } catch (error) {
       console.error('Error loading analytics:', error);
     } finally {
       setLoading(false);
     }
-  }, [period, customDates]);
+  }, [period]);
 
   const loadRealtime = useCallback(async () => {
     try {
@@ -127,9 +40,7 @@ const AnalyticsDashboard = () => {
     }
   }, []);
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
+  useEffect(() => { loadData(); }, [loadData]);
 
   useEffect(() => {
     if (activeView === 'realtime') {
@@ -141,30 +52,16 @@ const AnalyticsDashboard = () => {
 
   const periods = [
     { value: 'today', label: 'Hoje' },
-    { value: 'yesterday', label: 'Ontem' },
     { value: '7d', label: '7 dias' },
     { value: '30d', label: '30 dias' },
-    { value: 'this_month', label: 'Este mês' },
-    { value: 'last_month', label: 'Mês anterior' },
-    { value: 'custom', label: 'Personalizado' }
+    { value: 'this_month', label: 'Este mês' }
   ];
 
+  const formatNumber = (num) => (num || 0).toLocaleString('pt-BR');
+  
   const getDeviceIcon = (type) => {
-    switch (type?.toLowerCase()) {
-      case 'mobile': return <Smartphone className="w-4 h-4" />;
-      case 'tablet': return <Tablet className="w-4 h-4" />;
-      default: return <Monitor className="w-4 h-4" />;
-    }
-  };
-
-  const formatNumber = (num) => {
-    if (!num) return '0';
-    return num.toLocaleString('pt-BR');
-  };
-
-  const getPercentage = (value, total) => {
-    if (!total || !value) return '0%';
-    return ((value / total) * 100).toFixed(1) + '%';
+    if (type?.toLowerCase() === 'mobile') return <Smartphone className="w-4 h-4" />;
+    return <Monitor className="w-4 h-4" />;
   };
 
   if (loading && !overview) {
@@ -177,7 +74,7 @@ const AnalyticsDashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header with filters */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-2">
           <Button
@@ -207,7 +104,7 @@ const AnalyticsDashboard = () => {
                 variant={period === p.value ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setPeriod(p.value)}
-                className={period === p.value ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
+                className={period === p.value ? 'bg-emerald-600' : ''}
               >
                 {p.label}
               </Button>
@@ -216,31 +113,6 @@ const AnalyticsDashboard = () => {
         )}
       </div>
 
-      {/* Custom date range */}
-      {period === 'custom' && activeView === 'overview' && (
-        <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-slate-500" />
-            <input
-              type="date"
-              value={customDates.start}
-              onChange={e => setCustomDates(prev => ({ ...prev, start: e.target.value }))}
-              className="px-3 py-1.5 border rounded text-sm"
-            />
-            <span className="text-slate-500">até</span>
-            <input
-              type="date"
-              value={customDates.end}
-              onChange={e => setCustomDates(prev => ({ ...prev, end: e.target.value }))}
-              className="px-3 py-1.5 border rounded text-sm"
-            />
-          </div>
-          <Button size="sm" onClick={loadData} className="bg-emerald-600">
-            Aplicar
-          </Button>
-        </div>
-      )}
-
       {/* Realtime View */}
       {activeView === 'realtime' && (
         <div className="space-y-6">
@@ -248,312 +120,121 @@ const AnalyticsDashboard = () => {
             <CardContent className="py-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-emerald-100 text-sm font-medium">Usuários Online Agora</p>
+                  <p className="text-emerald-100 text-sm">Usuários Online Agora</p>
                   <p className="text-5xl font-bold mt-2">{realtime?.online_now || 0}</p>
                 </div>
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
-                    <Zap className="w-8 h-8" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse" />
-                </div>
+                <Zap className="w-12 h-12 opacity-50" />
               </div>
             </CardContent>
           </Card>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Users className="w-5 h-5 text-emerald-600" />
-                  Sessões Ativas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 max-h-64 overflow-y-auto">
-                  {realtime?.online_sessions?.length > 0 ? (
-                    realtime.online_sessions.map((session, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          {getDeviceIcon(session.device_type)}
-                          <div>
-                            <p className="text-sm font-medium text-slate-700">
-                              {session.pages?.[session.pages.length - 1] || '/'}
-                            </p>
-                            <p className="text-xs text-slate-500">
-                              {session.pageviews || session.pages?.length || 1} páginas
-                            </p>
-                          </div>
-                        </div>
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+          <Card className="border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-emerald-600" /> Sessões Ativas
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {realtime?.online_sessions?.length > 0 ? (
+                  realtime.online_sessions.map((session, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        {getDeviceIcon(session.device_type)}
+                        <span className="text-sm">{session.pages?.[session.pages.length - 1] || '/'}</span>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-slate-500 text-sm text-center py-4">Nenhuma sessão ativa</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Eye className="w-5 h-5 text-emerald-600" />
-                  Visualizações Recentes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {realtime?.recent_pageviews?.length > 0 ? (
-                    realtime.recent_pageviews.slice(0, 10).map((pv, index) => (
-                      <div key={index} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-                        <div className="flex items-center gap-2">
-                          {getDeviceIcon(pv.device_type)}
-                          <span className="text-sm text-slate-700">{pv.page}</span>
-                        </div>
-                        <span className="text-xs text-slate-500">
-                          {new Date(pv.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-slate-500 text-sm text-center py-4">Nenhuma visualização recente</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-slate-500 text-sm text-center py-4">Nenhuma sessão ativa</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
       {/* Overview View */}
       {activeView === 'overview' && (
-        <>
+        <div className="space-y-6">
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="border-0 shadow-lg">
               <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500">Visualizações</p>
-                    <p className="text-2xl font-bold text-slate-900">{formatNumber(overview?.total_pageviews)}</p>
-                  </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Eye className="w-6 h-6 text-blue-600" />
-                  </div>
-                </div>
+                <p className="text-sm text-slate-500">Visualizações</p>
+                <p className="text-2xl font-bold">{formatNumber(overview?.total_pageviews)}</p>
               </CardContent>
             </Card>
-
             <Card className="border-0 shadow-lg">
               <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500">Visitantes Únicos</p>
-                    <p className="text-2xl font-bold text-slate-900">{formatNumber(overview?.unique_visitors)}</p>
-                  </div>
-                  <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6 text-emerald-600" />
-                  </div>
-                </div>
+                <p className="text-sm text-slate-500">Visitantes Únicos</p>
+                <p className="text-2xl font-bold">{formatNumber(overview?.unique_visitors)}</p>
               </CardContent>
             </Card>
-
             <Card className="border-0 shadow-lg">
               <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500">Sessões</p>
-                    <p className="text-2xl font-bold text-slate-900">{formatNumber(overview?.total_sessions)}</p>
-                  </div>
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-purple-600" />
-                  </div>
-                </div>
+                <p className="text-sm text-slate-500">Sessões</p>
+                <p className="text-2xl font-bold">{formatNumber(overview?.total_sessions)}</p>
               </CardContent>
             </Card>
-
-            <Card className="border-0 shadow-lg bg-gradient-to-r from-emerald-500 to-emerald-600 text-white">
+            <Card className="border-0 shadow-lg bg-emerald-600 text-white">
               <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-emerald-100">Online Agora</p>
-                    <p className="text-2xl font-bold">{formatNumber(overview?.online_now)}</p>
-                  </div>
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <Zap className="w-6 h-6" />
-                  </div>
-                </div>
+                <p className="text-sm text-emerald-100">Online Agora</p>
+                <p className="text-2xl font-bold">{formatNumber(overview?.online_now)}</p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Timeline Chart */}
+          {/* Pages */}
           <Card className="border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-emerald-600" />
-                Visualizações ao Longo do Tempo
+                <Eye className="w-5 h-5 text-emerald-600" /> Páginas Mais Visitadas
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <TimelineChart data={timeline} />
+              {pageviews.length > 0 ? (
+                <div className="space-y-3">
+                  {pageviews.slice(0, 5).map((page, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <span className="text-sm text-slate-700">{page.page || '/'}</span>
+                      <span className="font-medium">{formatNumber(page.views)}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-500 text-sm">Sem dados</p>
+              )}
             </CardContent>
           </Card>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Top Pages */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-emerald-600" />
-                  Páginas Mais Visitadas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {pageviews.length > 0 ? (
-                  <SimpleBarChart 
-                    data={pageviews.slice(0, 5).map(p => ({ 
-                      label: p.page || '/', 
-                      value: p.views 
-                    }))}
-                  />
-                ) : (
-                  <p className="text-slate-500 text-sm">Sem dados</p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Devices */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Monitor className="w-5 h-5 text-emerald-600" />
-                  Dispositivos
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {devices?.devices?.length > 0 ? (
-                  <div className="space-y-4">
-                    {devices.devices.map((device, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          {getDeviceIcon(device.name)}
-                          <span className="text-sm text-slate-700 capitalize">{device.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 h-2 bg-slate-100 rounded overflow-hidden">
-                            <div 
-                              className="h-full bg-emerald-500 rounded"
-                              style={{ width: getPercentage(device.count, overview?.total_pageviews) }}
-                            />
-                          </div>
-                          <span className="text-sm font-medium text-slate-600 w-12 text-right">
-                            {getPercentage(device.count, overview?.total_pageviews)}
-                          </span>
-                        </div>
+          {/* Devices */}
+          <Card className="border-0 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Monitor className="w-5 h-5 text-emerald-600" /> Dispositivos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {devices?.devices?.length > 0 ? (
+                <div className="space-y-3">
+                  {devices.devices.map((device, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {getDeviceIcon(device.name)}
+                        <span className="text-sm capitalize">{device.name}</span>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-slate-500 text-sm">Sem dados</p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Traffic Sources */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-emerald-600" />
-                  Fontes de Tráfego (UTM)
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {trafficSources?.sources?.length > 0 ? (
-                  <SimpleBarChart 
-                    data={trafficSources.sources.slice(0, 5).map(s => ({ 
-                      label: s.name, 
-                      value: s.count 
-                    }))}
-                    color="blue"
-                  />
-                ) : (
-                  <p className="text-slate-500 text-sm">Nenhum tráfego com UTM</p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Actions */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MousePointer className="w-5 h-5 text-emerald-600" />
-                  Ações dos Usuários
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {actions.length > 0 ? (
-                  <SimpleBarChart 
-                    data={actions.slice(0, 5).map(a => ({ 
-                      label: a.action?.replace(/_/g, ' '), 
-                      value: a.count 
-                    }))}
-                    color="purple"
-                  />
-                ) : (
-                  <p className="text-slate-500 text-sm">Nenhuma ação rastreada</p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Browsers */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-emerald-600" />
-                  Navegadores
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {devices?.browsers?.length > 0 ? (
-                  <SimpleBarChart 
-                    data={devices.browsers.slice(0, 5).map(b => ({ 
-                      label: b.name, 
-                      value: b.count 
-                    }))}
-                    color="amber"
-                  />
-                ) : (
-                  <p className="text-slate-500 text-sm">Sem dados</p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Operating Systems */}
-            <Card className="border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Monitor className="w-5 h-5 text-emerald-600" />
-                  Sistemas Operacionais
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {devices?.operating_systems?.length > 0 ? (
-                  <SimpleBarChart 
-                    data={devices.operating_systems.slice(0, 5).map(os => ({ 
-                      label: os.name, 
-                      value: os.count 
-                    }))}
-                    color="rose"
-                  />
-                ) : (
-                  <p className="text-slate-500 text-sm">Sem dados</p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </>
+                      <span className="font-medium">{formatNumber(device.count)}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-500 text-sm">Sem dados</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );
