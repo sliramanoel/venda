@@ -2,11 +2,80 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Users, Eye, MousePointer, Monitor, Smartphone, Tablet,
   Globe, TrendingUp, Clock, RefreshCw, Calendar, Filter,
-  ArrowUp, ArrowDown, Activity, Zap
+  Activity, Zap
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { analyticsApi } from '../services/api';
+
+// Simple Bar Chart Component
+const SimpleBarChart = ({ data, color = 'emerald' }) => {
+  const max = Math.max(...data.map(d => d.value), 1);
+  return (
+    <div className="space-y-2">
+      {data.map((item, index) => (
+        <div key={index} className="flex items-center gap-3">
+          <div className="w-24 text-xs text-slate-600 truncate" title={item.label}>
+            {item.label}
+          </div>
+          <div className="flex-1 h-6 bg-slate-100 rounded overflow-hidden">
+            <div 
+              className={`h-full rounded transition-all duration-500 ${
+                color === 'blue' ? 'bg-blue-500' : 
+                color === 'purple' ? 'bg-purple-500' : 
+                color === 'amber' ? 'bg-amber-500' : 
+                color === 'rose' ? 'bg-rose-500' : 'bg-emerald-500'
+              }`}
+              style={{ width: `${(item.value / max) * 100}%` }}
+            />
+          </div>
+          <div className="w-16 text-right text-sm font-medium text-slate-700">
+            {item.value.toLocaleString('pt-BR')}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// Timeline Chart Component
+const TimelineChart = ({ data }) => {
+  if (!data || data.length === 0) return <p className="text-slate-500 text-sm">Sem dados</p>;
+  
+  const maxValue = Math.max(...data.map(d => d.pageviews || 0), 1);
+  const chartHeight = 150;
+  
+  return (
+    <div className="relative">
+      <div className="flex items-end justify-between gap-1" style={{ height: chartHeight }}>
+        {data.map((item, index) => {
+          const height = ((item.pageviews || 0) / maxValue) * chartHeight;
+          return (
+            <div key={index} className="flex-1 flex flex-col items-center group">
+              <div className="relative w-full">
+                <div 
+                  className="w-full bg-emerald-500 rounded-t hover:bg-emerald-600 transition-colors cursor-pointer"
+                  style={{ height: Math.max(height, 2) }}
+                />
+                <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">
+                  {item.pageviews} views
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-between mt-2 text-xs text-slate-500">
+        {data.length > 0 && (
+          <>
+            <span>{data[0]?.date?.split(' ')[0]}</span>
+            <span>{data[data.length - 1]?.date?.split(' ')[0]}</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const AnalyticsDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -19,7 +88,7 @@ const AnalyticsDashboard = () => {
   const [trafficSources, setTrafficSources] = useState(null);
   const [realtime, setRealtime] = useState(null);
   const [actions, setActions] = useState([]);
-  const [activeView, setActiveView] = useState('overview'); // overview, realtime
+  const [activeView, setActiveView] = useState('overview');
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -65,7 +134,7 @@ const AnalyticsDashboard = () => {
   useEffect(() => {
     if (activeView === 'realtime') {
       loadRealtime();
-      const interval = setInterval(loadRealtime, 10000); // Update every 10 seconds
+      const interval = setInterval(loadRealtime, 10000);
       return () => clearInterval(interval);
     }
   }, [activeView, loadRealtime]);
@@ -96,42 +165,6 @@ const AnalyticsDashboard = () => {
   const getPercentage = (value, total) => {
     if (!total || !value) return '0%';
     return ((value / total) * 100).toFixed(1) + '%';
-  };
-
-  // Render bar for chart
-  const renderBar = (item, index, max, color) => (
-    <div key={index} className="flex items-center gap-3">
-      <div className="w-24 text-xs text-slate-600 truncate" title={item.label}>
-        {item.label}
-      </div>
-      <div className="flex-1 h-6 bg-slate-100 rounded overflow-hidden">
-        <div 
-          className={`h-full bg-${color}-500 rounded transition-all duration-500`}
-          style={{ width: `${(item.value / max) * 100}%` }}
-        />
-      </div>
-      <div className="w-16 text-right text-sm font-medium text-slate-700">
-        {formatNumber(item.value)}
-      </div>
-    </div>
-  );
-
-  // Render timeline bar
-  const renderTimelineBar = (item, index, maxValue, chartHeight) => {
-    const height = ((item.pageviews || 0) / maxValue) * chartHeight;
-    return (
-      <div key={index} className="flex-1 flex flex-col items-center group">
-        <div className="relative w-full">
-          <div 
-            className="w-full bg-emerald-500 rounded-t hover:bg-emerald-600 transition-colors cursor-pointer"
-            style={{ height: Math.max(height, 2) }}
-          />
-          <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">
-            {item.pageviews} views
-          </div>
-        </div>
-      </div>
-    );
   };
 
   if (loading && !overview) {
@@ -211,7 +244,6 @@ const AnalyticsDashboard = () => {
       {/* Realtime View */}
       {activeView === 'realtime' && (
         <div className="space-y-6">
-          {/* Online Now */}
           <Card className="border-0 shadow-lg bg-gradient-to-r from-emerald-500 to-emerald-600 text-white">
             <CardContent className="py-8">
               <div className="flex items-center justify-between">
@@ -230,7 +262,6 @@ const AnalyticsDashboard = () => {
           </Card>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Active Sessions */}
             <Card className="border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -250,7 +281,7 @@ const AnalyticsDashboard = () => {
                               {session.pages?.[session.pages.length - 1] || '/'}
                             </p>
                             <p className="text-xs text-slate-500">
-                              {session.pageviews || session.pages?.length || 1} páginas visitadas
+                              {session.pageviews || session.pages?.length || 1} páginas
                             </p>
                           </div>
                         </div>
@@ -264,7 +295,6 @@ const AnalyticsDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Recent Pageviews */}
             <Card className="border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
