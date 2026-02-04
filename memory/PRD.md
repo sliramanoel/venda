@@ -1,7 +1,7 @@
 # NeuroVita - Product Requirements Document
 
 ## Problema Original
-Plataforma de e-commerce whitelabel completa para venda de produtos, com painel administrativo configurável, integração de pagamentos PIX via OrionPay, e rastreamento de conversões via Meta Pixel.
+Plataforma de e-commerce whitelabel completa para venda de produtos, com painel administrativo configurável, integração de pagamentos PIX via OrionPay, rastreamento de conversões via Meta Pixel, e sistema de Analytics.
 
 ## Público-Alvo
 - Empreendedores que desejam vender produtos online
@@ -23,6 +23,18 @@ Plataforma de e-commerce whitelabel completa para venda de produtos, com painel 
 - [x] Configuração de Meta Pixel
 - [x] Customização de tema/cores
 - [x] Visualização de pedidos com filtros e estatísticas
+- [x] **NEW: Dashboard de Analytics**
+
+### Sistema de Analytics (NOVO)
+- [x] Tracking de pageviews
+- [x] Tracking de ações (cliques, checkout, etc.)
+- [x] Contagem de visitantes únicos
+- [x] Sessões de usuários
+- [x] Usuários online em tempo real
+- [x] Filtros por período (Hoje, 7 dias, 30 dias, Mês)
+- [x] Detecção de dispositivo (mobile/desktop)
+- [x] Detecção de navegador e SO
+- [x] Captura de UTM parameters
 
 ### Pagamentos
 - [x] Integração OrionPay para PIX
@@ -42,43 +54,9 @@ Plataforma de e-commerce whitelabel completa para venda de produtos, com painel 
 - [x] Proteção contra pedidos falsos
 
 ### Deployment
-- [x] Script install.sh para VPS (v2.0 - testado e corrigido)
+- [x] Script install.sh para VPS (v2.0 - testado)
 - [x] docker-compose.yml para containerização
-- [x] Dockerfiles para backend e frontend
-- [x] Configuração Nginx para produção
-- [x] Guia de instalação completo (INSTALACAO.md)
-
----
-
-## Problemas Resolvidos na Instalação (v2.0)
-
-### 1. apt_pkg não encontrado (Ubuntu 22.04/24.04)
-- **Problema:** Symlink apontando para arquitetura errada (aarch64 vs x86_64)
-- **Solução:** Função `fix_apt_pkg()` que detecta e corrige automaticamente
-
-### 2. emergentintegrations no requirements.txt
-- **Problema:** Pacote interno não disponível publicamente
-- **Solução:** Removido e criado requirements.txt simplificado
-
-### 3. Conflito de dependências pip
-- **Problema:** Versões fixas conflitando entre si
-- **Solução:** Requirements.txt com versões mínimas flexíveis
-
-### 4. Nginx SSL antes do Certbot
-- **Problema:** Config com SSL antes dos certificados existirem
-- **Solução:** Config inicial sem SSL, Certbot adiciona depois
-
-### 5. Certbot com erro de Python
-- **Problema:** Incompatibilidade de versão Python
-- **Solução:** Instalação via Snap (mais isolado)
-
-### 6. bcrypt não funciona com www-data
-- **Problema:** Permissões de biblioteca nativa
-- **Solução:** Backend roda como root
-
-### 7. Frontend com URL errada
-- **Problema:** Build compilado com domínio antigo
-- **Solução:** Recompilação após definir .env correto
+- [x] Badge Emergent removido
 
 ---
 
@@ -86,44 +64,63 @@ Plataforma de e-commerce whitelabel completa para venda de produtos, com painel 
 
 ### Backend (FastAPI)
 - `/app/backend/server.py` - Aplicação principal
-- `/app/backend/routers/` - Endpoints da API
-- `/app/backend/models.py` - Schemas Pydantic
+- `/app/backend/routers/analytics.py` - Sistema de Analytics
+- `/app/backend/routers/` - Outros endpoints
 
-### Frontend (React + Vite)
-- `/app/frontend/src/pages/` - Páginas da aplicação
-- `/app/frontend/src/components/` - Componentes reutilizáveis
-- `/app/frontend/src/api/api.js` - Cliente Axios
+### Frontend (React)
+- `/app/frontend/src/pages/Admin.jsx` - Painel admin com Analytics
+- `/app/frontend/src/components/AnalyticsDashboard.jsx` - Dashboard de Analytics
+- `/app/frontend/src/services/api.js` - Cliente API com analyticsApi
 
 ### Banco de Dados (MongoDB)
-- **settings** - Configurações do site (singleton)
-- **orders** - Pedidos dos clientes
+- **settings** - Configurações do site
+- **orders** - Pedidos
 - **users** - Usuários admin
+- **pageviews** - Tracking de páginas (NOVO)
+- **sessions** - Sessões de usuários (NOVO)
+- **actions** - Ações rastreadas (NOVO)
 
 ---
 
-## Integrações
-- **OrionPay** - Pagamentos PIX
-- **Meta Pixel** - Rastreamento de conversões
+## API Endpoints de Analytics
+
+```
+POST /api/analytics/track/pageview - Rastrear visualização de página
+POST /api/analytics/track/action - Rastrear ação do usuário
+GET /api/analytics/stats/overview - Estatísticas gerais
+GET /api/analytics/stats/realtime - Usuários online em tempo real
+GET /api/analytics/stats/pageviews - Páginas mais visitadas
+GET /api/analytics/stats/devices - Dispositivos e navegadores
+GET /api/analytics/stats/traffic-sources - Fontes de tráfego (UTM)
+GET /api/analytics/stats/timeline - Visualizações ao longo do tempo
+GET /api/analytics/stats/actions - Ações dos usuários
+```
 
 ---
 
-## Instalação Testada em Produção
+## Instalação em Produção
 
-**Domínio:** neurovitanatural.com
+**Site Testado:** neurovitanatural.com
 **VPS:** VDSina (Ubuntu 22.04)
-**Data:** Fevereiro 2026
+
+### Comandos para Atualizar na VPS:
+```bash
+cd /var/www/neurovita
+git pull
+cd frontend && yarn build && cp -r build/* .
+systemctl restart neurovita-backend
+```
 
 ---
 
 ## Backlog (P2)
-- [ ] Refatorar Admin.jsx em componentes menores
+- [ ] Gráficos de linha para timeline de visualizações
+- [ ] Exportar dados de analytics para CSV
 - [ ] Sistema de backup automático MongoDB
-- [ ] Dashboard com gráficos de vendas
-- [ ] Notificações por email/WhatsApp
-- [ ] Múltiplos produtos/variações
+- [ ] Notificações por WhatsApp
 
 ---
 
 ## Última Atualização
-- **Data:** 03 de Fevereiro de 2026
-- **Status:** MVP Completo, instalação em VPS testada e funcionando
+- **Data:** 04 de Fevereiro de 2026
+- **Status:** MVP Completo + Sistema de Analytics
