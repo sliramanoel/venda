@@ -13,15 +13,36 @@ import Pagamento from "./pages/Pagamento";
 import Sucesso from "./pages/Sucesso";
 import Admin from "./pages/Admin";
 import Login from "./pages/Login";
-import { settingsApi } from "./services/api";
+import { settingsApi, analyticsApi } from "./services/api";
 import { initTracking, trackPageView } from "./utils/tracking";
+
+// Get UTM params from URL
+const getUtmParams = () => {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    utm_source: params.get('utm_source'),
+    utm_medium: params.get('utm_medium'),
+    utm_campaign: params.get('utm_campaign'),
+    utm_term: params.get('utm_term'),
+    utm_content: params.get('utm_content')
+  };
+};
 
 // Component to track page views on route change
 const PageTracker = () => {
   const location = useLocation();
   
   useEffect(() => {
+    // Track for Meta Pixel
     trackPageView();
+    
+    // Track for our Analytics system
+    const utmParams = getUtmParams();
+    analyticsApi.trackPageview({
+      page: location.pathname,
+      referrer: document.referrer || null,
+      ...utmParams
+    });
   }, [location.pathname]);
   
   return null;
