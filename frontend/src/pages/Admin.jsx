@@ -1258,6 +1258,21 @@ const Admin = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* ANALYTICS */}
+          <TabsContent value="analytics">
+            <Card className="border-0 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-emerald-600" /> 
+                  Analytics e Métricas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AnalyticsDashboard />
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
