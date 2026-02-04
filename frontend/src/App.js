@@ -48,7 +48,6 @@ const AppContent = () => {
     <>
       <ThemeProvider settings={settings} />
       <PageTracker />
-      <AnalyticsTracker />
       <Header />
       <main className="min-h-screen">
         <Routes>
