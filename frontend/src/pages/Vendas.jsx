@@ -16,6 +16,7 @@ import {
   trackLead,
   getOrderUTMParams 
 } from '../utils/tracking';
+import { trackCTAClick, trackStartCheckout, trackFormStart, trackFormComplete } from '../components/AnalyticsTracker';
 
 const shippingRates = {
   sudeste: { min: 15.90, max: 22.90, days: "3 a 5" },
