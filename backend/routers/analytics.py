@@ -383,7 +383,7 @@ async def get_traffic_sources(period: str = "7d", start_date: str = None, end_da
     
     # Referrers
     referrer_pipeline = [
-        {"$match": {"timestamp": {"$gte": start, "$lte": end}, "referrer": {"$ne": None, "$ne": ""}}},
+        {"$match": {"timestamp": {"$gte": start, "$lte": end}, "referrer": {"$nin": [None, ""]}}},
         {"$group": {"_id": "$referrer", "count": {"$sum": 1}}},
         {"$sort": {"count": -1}},
         {"$limit": 10}
