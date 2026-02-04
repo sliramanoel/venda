@@ -219,6 +219,9 @@ const Admin = () => {
             <TabsTrigger value="orders" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs">
               <Package className="w-4 h-4 mr-1" /> Pedidos
             </TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700 text-xs">
+              <Activity className="w-4 h-4 mr-1" /> Analytics
+            </TabsTrigger>
           </TabsList>
 
           {/* MARCA / BRAND */}
