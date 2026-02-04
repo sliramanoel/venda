@@ -145,4 +145,71 @@ export const uploadsApi = {
   }
 };
 
-export default { settingsApi, imagesApi, ordersApi, paymentsApi, uploadsApi, authApi };
+// Analytics API
+export const analyticsApi = {
+  // Tracking
+  trackPageview: async (data) => {
+    try {
+      await axios.post(`${API}/analytics/track/pageview`, data);
+    } catch (e) {
+      console.warn('Analytics tracking failed:', e);
+    }
+  },
+  trackAction: async (action, page, metadata = {}) => {
+    try {
+      await axios.post(`${API}/analytics/track/action`, { action, page, metadata });
+    } catch (e) {
+      console.warn('Analytics tracking failed:', e);
+    }
+  },
+  
+  // Stats (authenticated)
+  getOverview: async (period = '7d', startDate = null, endDate = null) => {
+    const params = new URLSearchParams({ period });
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    const response = await apiClient.get(`/analytics/stats/overview?${params}`);
+    return response.data;
+  },
+  getPageviews: async (period = '7d', startDate = null, endDate = null) => {
+    const params = new URLSearchParams({ period });
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    const response = await apiClient.get(`/analytics/stats/pageviews?${params}`);
+    return response.data;
+  },
+  getTimeline: async (period = '7d', granularity = 'day', startDate = null, endDate = null) => {
+    const params = new URLSearchParams({ period, granularity });
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    const response = await apiClient.get(`/analytics/stats/timeline?${params}`);
+    return response.data;
+  },
+  getDevices: async (period = '7d', startDate = null, endDate = null) => {
+    const params = new URLSearchParams({ period });
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    const response = await apiClient.get(`/analytics/stats/devices?${params}`);
+    return response.data;
+  },
+  getTrafficSources: async (period = '7d', startDate = null, endDate = null) => {
+    const params = new URLSearchParams({ period });
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    const response = await apiClient.get(`/analytics/stats/traffic-sources?${params}`);
+    return response.data;
+  },
+  getRealtime: async () => {
+    const response = await apiClient.get('/analytics/stats/realtime');
+    return response.data;
+  },
+  getActions: async (period = '7d', startDate = null, endDate = null) => {
+    const params = new URLSearchParams({ period });
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    const response = await apiClient.get(`/analytics/stats/actions?${params}`);
+    return response.data;
+  }
+};
+
+export default { settingsApi, imagesApi, ordersApi, paymentsApi, uploadsApi, authApi, analyticsApi };
